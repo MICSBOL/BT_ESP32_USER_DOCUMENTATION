@@ -2,7 +2,7 @@
 \contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}%
 \contentsline {section}{\numberline {1.1}What is the ESP32 RC Controller System}{5}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Who This Guide is For}{5}{section.1.2}%
-\contentsline {section}{\numberline {1.3}What You Can Build}{5}{section.1.3}%
+\contentsline {section}{\numberline {1.3}What You Can Build}{6}{section.1.3}%
 \contentsline {chapter}{\numberline {2}Required Components}{7}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Hardware Requirements}{7}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Optional Components}{7}{section.2.2}%
@@ -45,8 +45,8 @@
 \contentsline {subsection}{\numberline {5.7.4}Event Debug}{18}{subsection.5.7.4}%
 \contentsline {section}{\numberline {5.8}Debugging the Telemetry System}{19}{section.5.8}%
 \contentsline {subsection}{\numberline {5.8.1}Normal Operation}{19}{subsection.5.8.1}%
-\contentsline {subsection}{\numberline {5.8.2}Numeric Panel Debug Mode}{19}{subsection.5.8.2}%
-\contentsline {subsubsection}{Serial Monitor Input Format}{19}{section*.2}%
+\contentsline {subsection}{\numberline {5.8.2}Numeric Panel Debug Mode}{20}{subsection.5.8.2}%
+\contentsline {subsubsection}{Serial Monitor Input Format}{20}{section*.2}%
 \contentsline {subsubsection}{Value Conversion}{20}{section*.3}%
 \contentsline {subsubsection}{Valid Range}{20}{section*.4}%
 \contentsline {subsubsection}{Example}{20}{section*.5}%
@@ -55,10 +55,10 @@
 \contentsline {subsection}{\numberline {5.8.5}How the Telemetry Debug System Works}{22}{subsection.5.8.5}%
 \contentsline {section}{\numberline {5.9}Why Debug Mode is Important}{22}{section.5.9}%
 \contentsline {section}{\numberline {5.10}Customizing Telemetry Labels in the Android Application}{22}{section.5.10}%
-\contentsline {subsection}{\numberline {5.10.1}Where the Labels Are Defined}{22}{subsection.5.10.1}%
+\contentsline {subsection}{\numberline {5.10.1}Where the Labels Are Defined}{23}{subsection.5.10.1}%
 \contentsline {subsection}{\numberline {5.10.2}Plot Labels}{23}{subsection.5.10.2}%
 \contentsline {subsection}{\numberline {5.10.3}Numeric Panel Labels}{23}{subsection.5.10.3}%
-\contentsline {subsection}{\numberline {5.10.4}Indicator Labels}{23}{subsection.5.10.4}%
+\contentsline {subsection}{\numberline {5.10.4}Indicator Labels}{24}{subsection.5.10.4}%
 \contentsline {subsection}{\numberline {5.10.5}When the Labels Are Sent}{24}{subsection.5.10.5}%
 \contentsline {subsection}{\numberline {5.10.6}Important Notes}{24}{subsection.5.10.6}%
 \contentsline {chapter}{\numberline {6}Basic Controls}{25}{chapter.6}%
@@ -77,92 +77,92 @@
 \contentsline {section}{\numberline {8.1}RC Car (Differential Drive)}{29}{section.8.1}%
 \contentsline {section}{\numberline {8.2}Camera Control Platform (Pan/Tilt Head)}{30}{section.8.2}%
 \contentsline {section}{\numberline {8.3}Sensor Rover (Telemetry-First Build)}{31}{section.8.3}%
-\contentsline {section}{\numberline {8.4}Custom Robotics Platform (Modular, Expandable)}{31}{section.8.4}%
+\contentsline {section}{\numberline {8.4}Custom Robotics Platform (Modular, Expandable)}{32}{section.8.4}%
 \contentsline {section}{\numberline {8.5}Project Planning Checklist (Recommended)}{32}{section.8.5}%
-\contentsline {chapter}{\numberline {9}Wiring Diagrams}{33}{chapter.9}%
-\contentsline {section}{\numberline {9.1}Basic Robot Wiring}{33}{section.9.1}%
-\contentsline {section}{\numberline {9.2}Servo Control Example}{33}{section.9.2}%
-\contentsline {section}{\numberline {9.3}LED and Buzzer Outputs}{34}{section.9.3}%
-\contentsline {section}{\numberline {9.4}Sensor Connections}{34}{section.9.4}%
-\contentsline {chapter}{\numberline {10}Troubleshooting}{35}{chapter.10}%
-\contentsline {section}{\numberline {10.1}Before You Start: Quick Checklist}{35}{section.10.1}%
-\contentsline {section}{\numberline {10.2}ESP32 Firmware Does Not Upload}{35}{section.10.2}%
-\contentsline {section}{\numberline {10.3}ESP32 Powers On but Resets Randomly}{36}{section.10.3}%
-\contentsline {section}{\numberline {10.4}Bluetooth Pairing and Connection Problems (Android $\leftrightarrow $ ESP32)}{36}{section.10.4}%
-\contentsline {section}{\numberline {10.5}Controls Feel Wrong in the App (Android Side)}{37}{section.10.5}%
-\contentsline {section}{\numberline {10.6}Motors Do Not Move}{37}{section.10.6}%
-\contentsline {section}{\numberline {10.7}Servo Does Not Respond or Jitters}{38}{section.10.7}%
-\contentsline {section}{\numberline {10.8}Telemetry Data Not Appearing in the App}{38}{section.10.8}%
-\contentsline {section}{\numberline {10.9}I2C Devices Not Detected (MCP23017 or Sensors)}{38}{section.10.9}%
-\contentsline {section}{\numberline {10.10}General Debugging Tips (Recommended Workflow)}{38}{section.10.10}%
-\contentsline {chapter}{\numberline {11}Advanced Features}{40}{chapter.11}%
-\contentsline {section}{\numberline {11.1}Protocol Overview: Commands, Events, and Telemetry}{40}{section.11.1}%
-\contentsline {section}{\numberline {11.2}Telemetry System (Panels, Indicators, Plots)}{40}{section.11.2}%
-\contentsline {subsection}{\numberline {11.2.1}Telemetry categories}{40}{subsection.11.2.1}%
-\contentsline {subsection}{\numberline {11.2.2}Telemetry update rates (practical meaning)}{41}{subsection.11.2.2}%
-\contentsline {subsection}{\numberline {11.2.3}Automatic configuration handshake (labels)}{41}{subsection.11.2.3}%
-\contentsline {subsection}{\numberline {11.2.4}Panel resend window (robustness feature)}{41}{subsection.11.2.4}%
-\contentsline {section}{\numberline {11.3}Telemetry Sources and Debug Injection}{41}{section.11.3}%
-\contentsline {paragraph}{Why this matters:}{41}{section*.34}%
-\contentsline {section}{\numberline {11.4}Project Modes: ESP32-Only vs MCP23017 Expansion}{42}{section.11.4}%
-\contentsline {section}{\numberline {11.5}Using the MCP23017 GPIO Expander (I2C)}{42}{section.11.5}%
-\contentsline {subsection}{\numberline {11.5.1}Key details (from the implementation)}{42}{subsection.11.5.1}%
-\contentsline {subsection}{\numberline {11.5.2}Practical applications}{42}{subsection.11.5.2}%
-\contentsline {section}{\numberline {11.6}I2C Sensor Support (Examples Included)}{42}{section.11.6}%
-\contentsline {section}{\numberline {11.7}Analog Input Design for Bluetooth Compatibility}{42}{section.11.7}%
-\contentsline {paragraph}{Practical implication:}{42}{section*.35}%
-\contentsline {section}{\numberline {11.8}Feature Flags (Build-Time Modular Firmware)}{43}{section.11.8}%
-\contentsline {paragraph}{Note:}{43}{section*.36}%
-\contentsline {section}{\numberline {11.9}Putting It All Together: Example ``Advanced Build''}{43}{section.11.9}%
-\contentsline {chapter}{\numberline {12}Practical Control and Telemetry Examples}{44}{chapter.12}%
-\contentsline {section}{\numberline {12.1}Introduction}{44}{section.12.1}%
-\contentsline {section}{\numberline {12.2}Control Data from the Android Application}{44}{section.12.2}%
-\contentsline {subsection}{\numberline {12.2.1}RC state packet (\texttt {rcStatePacket})}{44}{subsection.12.2.1}%
-\contentsline {subsection}{\numberline {12.2.2}Event packet (\texttt {rcEventPacket})}{44}{subsection.12.2.2}%
-\contentsline {section}{\numberline {12.3}How the ESP32 Receives Packets}{45}{section.12.3}%
-\contentsline {section}{\numberline {12.4}Where Control Values are Applied}{45}{section.12.4}%
-\contentsline {section}{\numberline {12.5}Example 1: Steering Control Using the Left Joystick}{45}{section.12.5}%
-\contentsline {section}{\numberline {12.6}Example 2: Differential Drive Motor Speed Control}{46}{section.12.6}%
-\contentsline {subsection}{\numberline {12.6.1}Direction + speed mapping (implemented behavior)}{46}{subsection.12.6.1}%
-\contentsline {subsection}{\numberline {12.6.2}Smooth ramping (advanced behavior)}{46}{subsection.12.6.2}%
-\contentsline {section}{\numberline {12.7}Example 3: Camera Pan Control}{46}{section.12.7}%
-\contentsline {section}{\numberline {12.8}Example 4: Using Knobs to Control LED and Buzzer PWM}{47}{section.12.8}%
-\contentsline {section}{\numberline {12.9}Example 5: Controlling Digital Outputs with Switches}{47}{section.12.9}%
-\contentsline {section}{\numberline {12.10}Example 6: Handling Button Events (Pulse Outputs)}{48}{section.12.10}%
-\contentsline {subsection}{\numberline {12.10.1}Non-blocking pulses}{48}{subsection.12.10.1}%
-\contentsline {section}{\numberline {12.11}Telemetry Data Sent to the Android Application}{48}{section.12.11}%
-\contentsline {subsection}{\numberline {12.11.1}Telemetry types and rates (implemented)}{48}{subsection.12.11.1}%
-\contentsline {subsection}{\numberline {12.11.2}Config-on-connect}{48}{subsection.12.11.2}%
-\contentsline {section}{\numberline {12.12}Example 7: Battery Telemetry as an Indicator}{49}{section.12.12}%
-\contentsline {section}{\numberline {12.13}Example 8: Telemetry Panels from Analog Inputs}{49}{section.12.13}%
-\contentsline {section}{\numberline {12.14}Example 9: Plot Signals (0..255 Fast Graphs)}{49}{section.12.14}%
-\contentsline {section}{\numberline {12.15}Example 10: Digital Mask Indicators}{50}{section.12.15}%
-\contentsline {section}{\numberline {12.16}Summary}{50}{section.12.16}%
-\contentsline {chapter}{\numberline {13}Control Layer and Hardware Abstraction}{51}{chapter.13}%
-\contentsline {section}{\numberline {13.1}Purpose of This Chapter}{51}{section.13.1}%
-\contentsline {section}{\numberline {13.2}Layered Architecture (High-Level View)}{51}{section.13.2}%
-\contentsline {section}{\numberline {13.3}Control Packets and State Structures}{52}{section.13.3}%
-\contentsline {section}{\numberline {13.4}Control Layer (\texttt {control.cpp})}{52}{section.13.4}%
-\contentsline {subsection}{\numberline {13.4.1}Responsibilities}{52}{subsection.13.4.1}%
-\contentsline {subsection}{\numberline {13.4.2}Main loop: \texttt {controlUpdate()}}{53}{subsection.13.4.2}%
-\contentsline {subsection}{\numberline {13.4.3}Switch bit mask decoding}{53}{subsection.13.4.3}%
-\contentsline {subsection}{\numberline {13.4.4}Event handling: \texttt {controlHandleEvent(eventId)}}{53}{subsection.13.4.4}%
-\contentsline {section}{\numberline {13.5}Hardware Abstraction Layer (\texttt {hal\_output.cpp})}{53}{section.13.5}%
-\contentsline {subsection}{\numberline {13.5.1}Responsibilities}{53}{subsection.13.5.1}%
-\contentsline {subsection}{\numberline {13.5.2}PWM outputs (examples)}{54}{subsection.13.5.2}%
-\contentsline {subsection}{\numberline {13.5.3}Motor control: direction + dead-band + ramping}{54}{subsection.13.5.3}%
-\contentsline {subsection}{\numberline {13.5.4}Switch outputs: direct GPIO vs MCP23017}{54}{subsection.13.5.4}%
-\contentsline {subsection}{\numberline {13.5.5}Pulse outputs (momentary actions)}{54}{subsection.13.5.5}%
-\contentsline {section}{\numberline {13.6}Pin Mapping (\texttt {pins.h}) and Portability}{54}{section.13.6}%
-\contentsline {section}{\numberline {13.7}Summary}{55}{section.13.7}%
-\contentsline {chapter}{\numberline {14}Wiring Diagram Explained (Repository Reference)}{56}{chapter.14}%
-\contentsline {section}{\numberline {14.1}Quick Summary}{56}{section.14.1}%
-\contentsline {section}{\numberline {14.2}Diagram (Included)}{57}{section.14.2}%
-\contentsline {section}{\numberline {14.3}Straight Explanation of Each Group (What it does)}{58}{section.14.3}%
-\contentsline {subsection}{\numberline {14.3.1}I2C (SDA 21, SCL 22)}{58}{subsection.14.3.1}%
-\contentsline {subsection}{\numberline {14.3.2}Analog telemetry inputs (NUM1/NUM2/AIN1/AIN2)}{58}{subsection.14.3.2}%
-\contentsline {subsection}{\numberline {14.3.3}Digital indicator inputs (IND1--IND4)}{58}{subsection.14.3.3}%
-\contentsline {subsection}{\numberline {14.3.4}PWM outputs (PWM LX/LY/RX/RY/KL/KR)}{58}{subsection.14.3.4}%
-\contentsline {subsection}{\numberline {14.3.5}Switch outputs (SW1--SW6)}{58}{subsection.14.3.5}%
-\contentsline {subsection}{\numberline {14.3.6}Pulse/event outputs}{58}{subsection.14.3.6}%
-\contentsline {section}{\numberline {14.4}Resume (One Paragraph)}{58}{section.14.4}%
+\contentsline {chapter}{\numberline {9}Wiring Diagrams}{34}{chapter.9}%
+\contentsline {section}{\numberline {9.1}Basic Robot Wiring}{34}{section.9.1}%
+\contentsline {section}{\numberline {9.2}Servo Control Example}{34}{section.9.2}%
+\contentsline {section}{\numberline {9.3}LED and Buzzer Outputs}{35}{section.9.3}%
+\contentsline {section}{\numberline {9.4}Sensor Connections}{35}{section.9.4}%
+\contentsline {chapter}{\numberline {10}Troubleshooting}{36}{chapter.10}%
+\contentsline {section}{\numberline {10.1}Before You Start: Quick Checklist}{36}{section.10.1}%
+\contentsline {section}{\numberline {10.2}ESP32 Firmware Does Not Upload}{36}{section.10.2}%
+\contentsline {section}{\numberline {10.3}ESP32 Powers On but Resets Randomly}{37}{section.10.3}%
+\contentsline {section}{\numberline {10.4}Bluetooth Pairing and Connection Problems (Android $\leftrightarrow $ ESP32)}{37}{section.10.4}%
+\contentsline {section}{\numberline {10.5}Controls Feel Wrong in the App (Android Side)}{38}{section.10.5}%
+\contentsline {section}{\numberline {10.6}Motors Do Not Move}{38}{section.10.6}%
+\contentsline {section}{\numberline {10.7}Servo Does Not Respond or Jitters}{39}{section.10.7}%
+\contentsline {section}{\numberline {10.8}Telemetry Data Not Appearing in the App}{39}{section.10.8}%
+\contentsline {section}{\numberline {10.9}I2C Devices Not Detected (MCP23017 or Sensors)}{39}{section.10.9}%
+\contentsline {section}{\numberline {10.10}General Debugging Tips (Recommended Workflow)}{40}{section.10.10}%
+\contentsline {chapter}{\numberline {11}Advanced Features}{41}{chapter.11}%
+\contentsline {section}{\numberline {11.1}Protocol Overview: Commands, Events, and Telemetry}{41}{section.11.1}%
+\contentsline {section}{\numberline {11.2}Telemetry System (Panels, Indicators, Plots)}{41}{section.11.2}%
+\contentsline {subsection}{\numberline {11.2.1}Telemetry categories}{41}{subsection.11.2.1}%
+\contentsline {subsection}{\numberline {11.2.2}Telemetry update rates (practical meaning)}{42}{subsection.11.2.2}%
+\contentsline {subsection}{\numberline {11.2.3}Automatic configuration handshake (labels)}{42}{subsection.11.2.3}%
+\contentsline {subsection}{\numberline {11.2.4}Panel resend window (robustness feature)}{42}{subsection.11.2.4}%
+\contentsline {section}{\numberline {11.3}Telemetry Sources and Debug Injection}{42}{section.11.3}%
+\contentsline {paragraph}{Why this matters:}{43}{section*.34}%
+\contentsline {section}{\numberline {11.4}Project Modes: ESP32-Only vs MCP23017 Expansion}{43}{section.11.4}%
+\contentsline {section}{\numberline {11.5}Using the MCP23017 GPIO Expander (I2C)}{43}{section.11.5}%
+\contentsline {subsection}{\numberline {11.5.1}Key details (from the implementation)}{43}{subsection.11.5.1}%
+\contentsline {subsection}{\numberline {11.5.2}Practical applications}{43}{subsection.11.5.2}%
+\contentsline {section}{\numberline {11.6}I2C Sensor Support (Examples Included)}{43}{section.11.6}%
+\contentsline {section}{\numberline {11.7}Analog Input Design for Bluetooth Compatibility}{44}{section.11.7}%
+\contentsline {paragraph}{Practical implication:}{44}{section*.35}%
+\contentsline {section}{\numberline {11.8}Feature Flags (Build-Time Modular Firmware)}{44}{section.11.8}%
+\contentsline {paragraph}{Note:}{44}{section*.36}%
+\contentsline {section}{\numberline {11.9}Putting It All Together: Example ``Advanced Build''}{44}{section.11.9}%
+\contentsline {chapter}{\numberline {12}Practical Control and Telemetry Examples}{45}{chapter.12}%
+\contentsline {section}{\numberline {12.1}Introduction}{45}{section.12.1}%
+\contentsline {section}{\numberline {12.2}Control Data from the Android Application}{45}{section.12.2}%
+\contentsline {subsection}{\numberline {12.2.1}RC state packet (\texttt {rcStatePacket})}{45}{subsection.12.2.1}%
+\contentsline {subsection}{\numberline {12.2.2}Event packet (\texttt {rcEventPacket})}{46}{subsection.12.2.2}%
+\contentsline {section}{\numberline {12.3}How the ESP32 Receives Packets}{46}{section.12.3}%
+\contentsline {section}{\numberline {12.4}Where Control Values are Applied}{46}{section.12.4}%
+\contentsline {section}{\numberline {12.5}Example 1: Steering Control Using the Left Joystick}{46}{section.12.5}%
+\contentsline {section}{\numberline {12.6}Example 2: Differential Drive Motor Speed Control}{47}{section.12.6}%
+\contentsline {subsection}{\numberline {12.6.1}Direction + speed mapping (implemented behavior)}{47}{subsection.12.6.1}%
+\contentsline {subsection}{\numberline {12.6.2}Smooth ramping (advanced behavior)}{47}{subsection.12.6.2}%
+\contentsline {section}{\numberline {12.7}Example 3: Camera Pan Control}{48}{section.12.7}%
+\contentsline {section}{\numberline {12.8}Example 4: Using Knobs to Control LED and Buzzer PWM}{48}{section.12.8}%
+\contentsline {section}{\numberline {12.9}Example 5: Controlling Digital Outputs with Switches}{48}{section.12.9}%
+\contentsline {section}{\numberline {12.10}Example 6: Handling Button Events (Pulse Outputs)}{49}{section.12.10}%
+\contentsline {subsection}{\numberline {12.10.1}Non-blocking pulses}{49}{subsection.12.10.1}%
+\contentsline {section}{\numberline {12.11}Telemetry Data Sent to the Android Application}{49}{section.12.11}%
+\contentsline {subsection}{\numberline {12.11.1}Telemetry types and rates (implemented)}{50}{subsection.12.11.1}%
+\contentsline {subsection}{\numberline {12.11.2}Config-on-connect}{50}{subsection.12.11.2}%
+\contentsline {section}{\numberline {12.12}Example 7: Battery Telemetry as an Indicator}{50}{section.12.12}%
+\contentsline {section}{\numberline {12.13}Example 8: Telemetry Panels from Analog Inputs}{50}{section.12.13}%
+\contentsline {section}{\numberline {12.14}Example 9: Plot Signals (0..255 Fast Graphs)}{51}{section.12.14}%
+\contentsline {section}{\numberline {12.15}Example 10: Digital Mask Indicators}{51}{section.12.15}%
+\contentsline {section}{\numberline {12.16}Summary}{51}{section.12.16}%
+\contentsline {chapter}{\numberline {13}Control Layer and Hardware Abstraction}{52}{chapter.13}%
+\contentsline {section}{\numberline {13.1}Purpose of This Chapter}{52}{section.13.1}%
+\contentsline {section}{\numberline {13.2}Layered Architecture (High-Level View)}{52}{section.13.2}%
+\contentsline {section}{\numberline {13.3}Control Packets and State Structures}{53}{section.13.3}%
+\contentsline {section}{\numberline {13.4}Control Layer (\texttt {control.cpp})}{53}{section.13.4}%
+\contentsline {subsection}{\numberline {13.4.1}Responsibilities}{53}{subsection.13.4.1}%
+\contentsline {subsection}{\numberline {13.4.2}Main loop: \texttt {controlUpdate()}}{54}{subsection.13.4.2}%
+\contentsline {subsection}{\numberline {13.4.3}Switch bit mask decoding}{54}{subsection.13.4.3}%
+\contentsline {subsection}{\numberline {13.4.4}Event handling: \texttt {controlHandleEvent(eventId)}}{54}{subsection.13.4.4}%
+\contentsline {section}{\numberline {13.5}Hardware Abstraction Layer (\texttt {hal\_output.cpp})}{55}{section.13.5}%
+\contentsline {subsection}{\numberline {13.5.1}Responsibilities}{55}{subsection.13.5.1}%
+\contentsline {subsection}{\numberline {13.5.2}PWM outputs (examples)}{55}{subsection.13.5.2}%
+\contentsline {subsection}{\numberline {13.5.3}Motor control: direction + dead-band + ramping}{55}{subsection.13.5.3}%
+\contentsline {subsection}{\numberline {13.5.4}Switch outputs: direct GPIO vs MCP23017}{55}{subsection.13.5.4}%
+\contentsline {subsection}{\numberline {13.5.5}Pulse outputs (momentary actions)}{55}{subsection.13.5.5}%
+\contentsline {section}{\numberline {13.6}Pin Mapping (\texttt {pins.h}) and Portability}{56}{section.13.6}%
+\contentsline {section}{\numberline {13.7}Summary}{56}{section.13.7}%
+\contentsline {chapter}{\numberline {14}Wiring Diagram Explained (Repository Reference)}{57}{chapter.14}%
+\contentsline {section}{\numberline {14.1}Quick Summary}{57}{section.14.1}%
+\contentsline {section}{\numberline {14.2}Diagram (Included)}{58}{section.14.2}%
+\contentsline {section}{\numberline {14.3}Straight Explanation of Each Group (What it does)}{59}{section.14.3}%
+\contentsline {subsection}{\numberline {14.3.1}I2C (SDA 21, SCL 22)}{59}{subsection.14.3.1}%
+\contentsline {subsection}{\numberline {14.3.2}Analog telemetry inputs (NUM1/NUM2/AIN1/AIN2)}{59}{subsection.14.3.2}%
+\contentsline {subsection}{\numberline {14.3.3}Digital indicator inputs (IND1--IND4)}{59}{subsection.14.3.3}%
+\contentsline {subsection}{\numberline {14.3.4}PWM outputs (PWM LX/LY/RX/RY/KL/KR)}{59}{subsection.14.3.4}%
+\contentsline {subsection}{\numberline {14.3.5}Switch outputs (SW1--SW6)}{59}{subsection.14.3.5}%
+\contentsline {subsection}{\numberline {14.3.6}Pulse/event outputs}{59}{subsection.14.3.6}%
+\contentsline {section}{\numberline {14.4}Resume (One Paragraph)}{60}{section.14.4}%

@@ -350,7 +350,7 @@ project. It shows:
         % =====================================================
 
         % Local reference
-        \coordinate (motorbase) at (-6,-25);
+        \coordinate (motorbase) at (-9.5,-22);
 
         % Motor symbol
         \node[draw, circle, minimum size=0.9cm] (motor) at ($(motorbase)+(0,2.0)$) {\small M};
@@ -394,7 +394,7 @@ project. It shows:
         % =====================================================
 
         % Reference point
-        \coordinate (pwmkr) at (3.5,-25);
+        \coordinate (pwmkr) at (-14.5,-18);
 
         % LED circuit
         \draw (pwmkr)
@@ -411,13 +411,13 @@ project. It shows:
         % H-BRIDGE MOTOR DRIVER (DRV8833) FOR PWM CONTROL
         % =====================================================
 
-        \node[draw, thick, minimum width=3.8cm, minimum height=4cm] (drv) at (-2,-17) {DRV8833};
+        \node[draw, thick, minimum width=3.8cm, minimum height=4cm] (drv) at (1,-22) {DRV8833};
 
         % -----------------------------------------------------
         % Motor A
         % -----------------------------------------------------
 
-        \node[draw, circle, minimum size=0.9cm] (motorA) at (3,-18.0) {M};
+        \node[draw, circle, minimum size=0.9cm] (motorA) at (5,-23.0) {M};
 
         \draw (drv.east) ++(1.6,-0.4)
         node[left]{\small AOUT1}
@@ -427,13 +427,13 @@ project. It shows:
         node[left]{\small AOUT2}
         -| (motorA.south);
 
-        \node at (4.6,-18.0) {\small DC Motor A};
+        \node at (6.6,-23.0) {\small DC Motor A};
 
         % -----------------------------------------------------
         % Motor B
         % -----------------------------------------------------
 
-        \node[draw, circle, minimum size=0.9cm] (motorB) at (3,-15.8) {M};
+        \node[draw, circle, minimum size=0.9cm] (motorB) at (5,-20.8) {M};
 
         \draw (drv.east) ++(1.6,1.8)
         node[left]{\small BOUT1}
@@ -443,7 +443,7 @@ project. It shows:
         node[left]{\small BOUT2}
         -| (motorB.south);
 
-        \node at (4.6,-15.8) {\small DC Motor B};
+        \node at (6.6,-20.8) {\small DC Motor B};
 
         % -----------------------------------------------------
         % Motor supply
