@@ -1,0 +1,50 @@
+% Cover page for BT_ESP32_USER_DOCUMENTATION
+% Usage (in main.tex, after \begin{document} and before \tableofcontents):
+    %   \input{chapters/00_cover_page}
+    %   \clearpage
+
+    \begin{titlepage}
+        \centering
+
+        \vspace*{1.2cm}
+
+        {\Huge\bfseries Bluetooth RC Controller System\par}
+        \vspace{0.3cm}
+        {\Large\bfseries Android App + ESP32 Firmware Documentation\par}
+
+        \vspace{0.8cm}
+        {\large (EmitterApp + ESP32\_BT\_Controller)\par}
+
+        \vspace{1.2cm}
+        \rule{0.9\textwidth}{0.8pt}\par
+        \vspace{0.6cm}
+
+        {\large
+            This document explains how to build, wire, configure, and debug a Bluetooth-based
+            remote control system using an Android application and an ESP32 controller firmware.
+            \par}
+
+        \vspace{0.9cm}
+
+        \begin{minipage}{0.9\textwidth}
+            \raggedright
+            \textbf{Included topics}
+            \begin{itemize}
+                \item Firmware upload and Bluetooth connection
+                \item Basic controls (joysticks, knobs, switches, buttons)
+                \item Wiring diagrams and pin mapping (\texttt{pins.h})
+                \item Telemetry panels, indicators, and plots
+                \item Control layer vs hardware abstraction (\texttt{control.cpp}, \texttt{hal\_output.cpp})
+                \item Troubleshooting (Android and ESP32)
+            \end{itemize}
+        \end{minipage}
+
+        \vfill
+
+        \begin{tabular}{@{}rl@{}}
+            \textbf{Repository:} & \texttt{mikechip777/BT\_ESP32\_USER\_DOCUMENTATION} \\
+            \textbf{Date:} & \today \\
+        \end{tabular}
+
+        \vspace*{1.0cm}
+    \end{titlepage}
