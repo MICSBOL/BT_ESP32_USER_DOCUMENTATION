@@ -1,0 +1,239 @@
+\chapter{Control Layer and Hardware Abstraction}
+\label{ch:control-hal}
+
+\section{Purpose of This Chapter}
+\label{sec:control-hal-purpose}
+
+This chapter documents how the \textbf{MICSBOL/ESP32\_BT\_Controller} firmware separates:
+
+\begin{itemize}
+    \item \textbf{control logic} (what the robot should do when the user moves a stick), and
+    \item \textbf{hardware driving} (how the ESP32 writes PWM/GPIO/I\textsuperscript{2}C signals).
+\end{itemize}
+
+The repository implements this separation primarily through:
+
+\begin{itemize}
+    \item \texttt{control.cpp} / \texttt{control.h} --- the control layer
+    \item \texttt{hal\_output.cpp} --- the hardware abstraction layer (HAL)
+    \item \texttt{pins.h} --- the hardware mapping used by the HAL
+    \item \texttt{pulse.cpp} / \texttt{pulse.h} --- non-blocking pulse outputs used by event actions
+\end{itemize}
+
+\section{Layered Architecture (High-Level View)}
+\label{sec:control-hal-architecture}
+
+The firmware uses a layered flow from the Android app to physical hardware:
+
+\begin{enumerate}
+    \item \textbf{Android app} transmits RC state packets and event packets over Bluetooth (SPP).
+    \item \textbf{Receiver layer} (\texttt{receiver.cpp}) decodes packets and updates:
+    \begin{itemize}
+        \item \texttt{rcStatePacket} for continuous control values
+        \item \texttt{rcEventPacket} for one-shot button events
+    \end{itemize}
+    \item \textbf{Control layer} (\texttt{control.cpp}) interprets \texttt{rcStatePacket} and calls HAL functions.
+    \item \textbf{HAL} (\texttt{hal\_output.cpp}) performs the actual GPIO/PWM/I\textsuperscript{2}C operations.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw, thick, minimum width=11.8cm, minimum height=1.05cm, align=center},
+        arrow/.style={->, thick},
+        node distance=0.9cm
+        ]
+        \node[block] (android) {Android App (UI Controls)};
+        \node[block, below=of android] (bt) {Bluetooth Serial (SPP)};
+        \node[block, below=of bt] (rx) {\texttt{receiver.cpp} (decode into \texttt{rcStatePacket} / \texttt{rcEventPacket})};
+        \node[block, below=of rx] (control) {\texttt{control.cpp} (control policy: mapping inputs to actions)};
+        \node[block, below=of control] (hal) {\texttt{hal\_output.cpp} (hardware mechanisms: PWM/GPIO/MCP)};
+        \node[block, below=of hal] (hw) {Hardware (motors, servos, LEDs, switches, MCP23017)};
+
+        \draw[arrow] (android) -- (bt);
+        \draw[arrow] (bt) -- (rx);
+        \draw[arrow] (rx) -- (control);
+        \draw[arrow] (control) -- (hal);
+        \draw[arrow] (hal) -- (hw);
+    \end{tikzpicture}
+    \caption{Control data flow from Android to ESP32 hardware.}
+\end{figure}
+
+\section{Control Packets and State Structures}
+\label{sec:control-hal-packets}
+
+Control values are stored in \texttt{rcStatePacket} (defined in \texttt{packets.h}).
+The fields include:
+
+\begin{itemize}
+    \item \texttt{leftStickX}, \texttt{leftStickY}
+    \item \texttt{rightStickX}, \texttt{rightStickY}
+    \item \texttt{leftKnob}, \texttt{rightKnob}
+    \item \texttt{switches} (bit mask)
+\end{itemize}
+
+In the current firmware logic, stick and knob channels are treated as 12-bit values (nominal range 0 to 4095).
+
+Button presses are delivered through \texttt{rcEventPacket} (also in \texttt{packets.h}) and are handled by
+\texttt{controlHandleEvent(eventId)}.
+
+\section{Control Layer (\texttt{control.cpp})}
+\label{sec:control-hal-control-layer}
+
+\subsection{Responsibilities}
+\label{subsec:control-hal-control-resp}
+
+The control layer is responsible for:
+
+\begin{itemize}
+    \item mapping sticks and knobs to actuator commands,
+    \item selecting which HAL function to call for each logical output,
+    \item decoding the switch bit mask into per-output states,
+    \item handling discrete button events by triggering pulse outputs.
+\end{itemize}
+
+\subsection{Main loop: \texttt{controlUpdate()}}
+\label{subsec:control-hal-controlUpdate}
+
+The main control function is:
+
+\begin{verbatim}
+    controlUpdate()
+\end{verbatim}
+
+In the repository implementation, \texttt{controlUpdate()} reads values from \texttt{rcStatePacket} and calls:
+
+\begin{itemize}
+    \item \texttt{halSetSteering(...)}
+    \item \texttt{halSetMotorLeft(...)}
+    \item \texttt{halSetMotorRight(...)}
+    \item \texttt{halSetCameraPan(...)}
+    \item \texttt{halSetLed(...)}
+    \item \texttt{halSetBuzzer(...)}
+    \item \texttt{halSetSwitch(index, state)}
+\end{itemize}
+
+A key helper is the servo mapping function in \texttt{control.cpp}:
+
+\begin{verbatim}
+    static uint32_t mapServo(uint16_t v) {
+        return map(v, 0, 4095, 205, 410);
+    }
+\end{verbatim}
+
+\subsection{Switch bit mask decoding}
+\label{subsec:control-hal-switch-mask}
+
+Switches are transmitted as a single byte \texttt{rcStatePacket.data.switches}.
+The control layer converts bits into outputs:
+
+\begin{verbatim}
+    for (int i = 0; i < 6; i++) {
+        halSetSwitch(i, (sw >> i) & 1);
+    }
+\end{verbatim}
+
+\subsection{Event handling: \texttt{controlHandleEvent(eventId)}}
+\label{subsec:control-hal-events}
+
+Discrete events (button presses) are handled by:
+
+\begin{verbatim}
+    controlHandleEvent(byte eventId)
+\end{verbatim}
+
+In the repository, events map to pulse outputs via \texttt{halPulseSwitch(index)}. The mapping depends on
+project mode (direct GPIO vs MCP expander mode).
+
+\section{Hardware Abstraction Layer (\texttt{hal\_output.cpp})}
+\label{sec:control-hal-hal-layer}
+
+\subsection{Responsibilities}
+\label{subsec:control-hal-hal-resp}
+
+The HAL implements the \emph{mechanisms} to drive hardware:
+
+\begin{itemize}
+    \item PWM output via ESP32 LEDC using \texttt{ledcWrite(...)}
+    \item GPIO output via \texttt{digitalWrite(...)}
+    \item MCP23017 expander output via \texttt{mcpWriteOutput(...)} (I\textsuperscript{2}C)
+    \item motor direction pins and a dead-band mapping
+    \item ramping motor speed using a periodic timer callback
+    \item non-blocking pulse outputs using the pulse module
+\end{itemize}
+
+\subsection{PWM outputs (examples)}
+\label{subsec:control-hal-hal-pwm}
+
+Examples from \texttt{hal\_output.cpp}:
+
+\begin{verbatim}
+    void halSetSteering(uint32_t value) { ledcWrite(PIN_PWM_STICK_LX, value); }
+    void halSetLed(uint32_t value)      { ledcWrite(PIN_PWM_KNOB_L, value);  }
+    void halSetBuzzer(uint32_t value)   { ledcWrite(PIN_PWM_KNOB_R, value);  }
+\end{verbatim}
+
+\subsection{Motor control: direction + dead-band + ramping}
+\label{subsec:control-hal-hal-motors}
+
+Motor control in the HAL uses:
+
+\begin{itemize}
+    \item direction pins \texttt{PIN\_MD\_LEFT} and \texttt{PIN\_MD\_RIGHT}
+    \item PWM output pins \texttt{PIN\_PWM\_STICK\_LY} (left) and \texttt{PIN\_PWM\_STICK\_RY} (right)
+\end{itemize}
+
+The HAL interprets motor values with a dead-band around the center, and it ramps actual motor PWM
+toward a target value using a timer-driven update function.
+
+\subsection{Switch outputs: direct GPIO vs MCP23017}
+\label{subsec:control-hal-hal-switches}
+
+The HAL provides a uniform interface:
+
+\begin{verbatim}
+    halSetSwitch(uint8_t index, bool state)
+\end{verbatim}
+
+but the implementation depends on build mode:
+
+\begin{itemize}
+    \item In direct GPIO mode, a small array of ESP32 pins is written using \texttt{digitalWrite(...)}.
+    \item In MCP mode, the output is written using \texttt{mcpWriteOutput(...)} over I\textsuperscript{2}C.
+\end{itemize}
+
+\subsection{Pulse outputs (momentary actions)}
+\label{subsec:control-hal-hal-pulses}
+
+Pulse outputs are triggered by \texttt{halPulseSwitch(index)} and implemented using:
+
+\begin{itemize}
+    \item \texttt{pulseStart(pin, durationMs)} to begin a pulse
+    \item \texttt{pulseUpdate()} to end it after the requested duration
+\end{itemize}
+
+This design is non-blocking, so the control loop can continue running while pulses are active.
+
+\section{Pin Mapping (\texttt{pins.h}) and Portability}
+\label{sec:control-hal-pins}
+
+Hardware mappings are centralized in \texttt{pins.h}. When adapting the firmware to new hardware:
+
+\begin{enumerate}
+    \item update \texttt{pins.h} to match your wiring,
+    \item adjust \texttt{hal\_output.cpp} if your motor driver or output logic differs,
+    \item keep \texttt{control.cpp} stable as ``policy'' whenever possible.
+\end{enumerate}
+
+\section{Summary}
+\label{sec:control-hal-summary}
+
+The repository implements a clear separation between:
+
+\begin{itemize}
+    \item \textbf{Policy:} \texttt{control.cpp} interprets \texttt{rcStatePacket} and decides what actions to take.
+    \item \textbf{Mechanism:} \texttt{hal\_output.cpp} drives PWM/GPIO/I\textsuperscript{2}C hardware to perform those actions.
+\end{itemize}
+
+This makes the firmware easier to port across different robots and wiring layouts, while keeping the codebase
+organized and maintainable.

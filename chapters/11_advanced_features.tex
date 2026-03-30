@@ -1,0 +1,174 @@
+\chapter{Advanced Features}
+\label{ch:advanced-features}
+
+The \textbf{ESP32\_BT\_Controller} firmware is designed as a modular RC + telemetry platform.
+Beyond basic joystick control, it includes a lightweight communication protocol, configurable
+project modes, a structured telemetry system, and optional I2C expansion.
+
+This chapter highlights the most useful advanced features and explains how they work in practice.
+
+\section{Protocol Overview: Commands, Events, and Telemetry}
+\label{sec:protocol-overview}
+
+Communication is packet-based (see \texttt{packets.h}). The firmware uses:
+
+\begin{itemize}
+    \item \textbf{RC State packets:} continuous control state (sticks, knobs, switches).
+    \item \textbf{Event packets:} short one-shot commands (button presses).
+    \item \textbf{Telemetry packets:} feedback from the ESP32 to the Android app (panels, indicators, plots, and configuration labels).
+\end{itemize}
+
+All packets use:
+\begin{itemize}
+    \item Fixed headers (e.g., \texttt{0xCC} followed by a packet type byte)
+    \item Packed layouts for predictable parsing
+    \item A simple additive checksum (lightweight and fast for embedded systems)
+\end{itemize}
+
+\section{Telemetry System (Panels, Indicators, Plots)}
+\label{sec:telemetry}
+
+Telemetry is one of the most powerful parts of this firmware. It allows the ESP32 to send
+real-time values back to the Android app so the operator can \emph{see what the robot is doing}
+while driving it.
+
+\subsection{Telemetry categories}
+The firmware generates multiple telemetry streams (implemented in \texttt{telemetry.cpp}):
+
+\begin{itemize}
+    \item \textbf{Panels} (left/right numeric values): compact readings such as distance, speed, temperature, or any sensor-derived number.
+    \item \textbf{Indicators}: a small set of ``status widgets'' including:
+    \begin{itemize}
+        \item an analog value (0--100)
+        \item a battery level (0--100)
+        \item a digital mask (bitfield) for multiple on/off indicators
+    \end{itemize}
+    \item \textbf{Plots}: fast-updating series for time graphs (default labels include \texttt{Volts}, \texttt{Amps}, and \texttt{RPMs}).
+\end{itemize}
+
+\subsection{Telemetry update rates (practical meaning)}
+Telemetry is sent periodically (timing constants in \texttt{telemetry.cpp}):
+
+\begin{itemize}
+    \item \textbf{Plots:} every 50 ms (\(\approx 20\,Hz\)) --- smooth graphs for fast-changing signals.
+    \item \textbf{Indicators:} every 500 ms (\(\approx 2\,Hz\)) --- stable UI values for battery/status.
+\end{itemize}
+
+\subsection{Automatic configuration handshake (labels)}
+When the phone connects, the ESP32 sends a \textbf{configuration telemetry packet once per connection}
+(\texttt{sendConfigTelemetry()}). This packet provides the app with human-readable labels for:
+
+\begin{itemize}
+    \item plot series names (e.g., \texttt{Volts}, \texttt{Amps}, \texttt{RPMs})
+    \item panel names (e.g., \texttt{Left}, \texttt{Right})
+    \item indicator names (e.g., \texttt{Throttle}, \texttt{Battery})
+\end{itemize}
+
+This is a major usability feature: the Android app can populate labels automatically without
+hardcoding them for each robot build.
+
+\subsection{Panel resend window (robustness feature)}
+Panel values use a small resend mechanism (``retry window'') so that when a panel reading changes, it is
+retransmitted repeatedly for a short period (see \texttt{resendWindow} and \texttt{resendInterval} in
+\texttt{telemetry.cpp}). This improves the chance that the phone receives the updated reading even if a
+packet is missed.
+
+\section{Telemetry Sources and Debug Injection}
+\label{sec:telemetry-sources}
+
+Telemetry is intentionally split into two layers:
+
+\begin{itemize}
+    \item \textbf{\texttt{telemetry.cpp}} is \emph{write-only}: it builds packets and sends them.
+    \item \textbf{\texttt{telemetry\_source.cpp}} decides \emph{where data comes from}: hardware reads or debug values.
+\end{itemize}
+
+In normal operation, panel/indicator/plot values are read from hardware through \texttt{input\_hw.h}
+functions (e.g., numeric inputs and ADC readings). In debug modes, values can be injected over serial
+by typing simple comma-separated values. This makes it possible to verify Android UI behavior and packet
+decoding \emph{without} real sensors connected.
+
+\paragraph{Why this matters:}
+You can develop UI + telemetry displays first, then integrate hardware later, reducing iteration time.
+
+\section{Project Modes: ESP32-Only vs MCP23017 Expansion}
+\label{sec:project-modes}
+
+The firmware can be built in different project modes (configured in \texttt{user\_config.h}):
+
+\begin{itemize}
+    \item \texttt{MODE\_FULL\_RC}: full RC control using ESP32 GPIO directly.
+    \item \texttt{MODE\_FULL\_RC\_MCP}: full RC control using an MCP23017 over I2C for expanded digital I/O.
+\end{itemize}
+
+Selecting the correct mode is an ``advanced feature'' because it allows a single codebase to scale from
+small robots to larger builds with many switches and indicators.
+
+\section{Using the MCP23017 GPIO Expander (I2C)}
+\label{sec:mcp23017}
+
+The MCP23017 adds 16 digital I/O pins over I2C and is supported by the firmware (\texttt{mcp\_io.cpp/.h}).
+
+\subsection{Key details (from the implementation)}
+\begin{itemize}
+    \item \textbf{I2C address:} \texttt{0x20}
+    \item \textbf{Port A (GPIOA):} configured as \textbf{INPUT} (used for reading digital indicators)
+    \item \textbf{Port B (GPIOB):} configured as \textbf{OUTPUT} (used for switch and event outputs)
+    \item Outputs are tracked in software (\texttt{portBState}) so individual pins can be toggled reliably.
+\end{itemize}
+
+\subsection{Practical applications}
+\begin{itemize}
+    \item A control box with many switches (arm, lights, modes, accessories)
+    \item A robot with many status inputs (limit switches, fault lines, bumper sensors)
+    \item Complex LED indicator arrays (without consuming ESP32 GPIO)
+\end{itemize}
+
+\section{I2C Sensor Support (Examples Included)}
+\label{sec:i2c-sensors}
+
+The repository includes example I2C sensor reads in \texttt{i2c\_sensors.cpp}:
+
+\begin{itemize}
+    \item A temperature sensor at address \texttt{0x48}
+    \item An IMU example at address \texttt{0x68} (accelerometer reads, e.g., MPU6050-style registers)
+\end{itemize}
+
+These examples act as templates: you can add initialization steps and additional registers to support
+your exact sensor module.
+
+\section{Analog Input Design for Bluetooth Compatibility}
+\label{sec:adc1}
+
+A subtle but important advanced design choice is the use of \textbf{ADC1-only} inputs for analog reads
+in the default pin configuration. On ESP32, ADC2 is commonly problematic when Wi-Fi/Bluetooth is active,
+so the repo pin map keeps analog telemetry on ADC1-capable pins (see \texttt{pins.h}).
+
+\paragraph{Practical implication:}
+If you add analog sensors, prefer the configured ADC1 pins (or other ADC1 channels) to avoid intermittent
+or invalid readings while Bluetooth is connected.
+
+\section{Feature Flags (Build-Time Modular Firmware)}
+\label{sec:feature-flags}
+
+Build-time feature flags are defined in \texttt{feature\_config.h}. They control whether subsystems
+are compiled/enabled (PWM outputs, switch outputs, event outputs, telemetry, I2C sensor features, etc.).
+
+\paragraph{Note:}
+In the current repository snapshot, \texttt{USE\_TELEMETRY} and \texttt{USE\_I2C\_SENSOR} are defined as
+\texttt{0} in both project modes, while telemetry implementation code exists in the repo. This suggests
+telemetry can be enabled/disabled by configuration depending on project needs (e.g., to reduce bandwidth or CPU use).
+
+\section{Putting It All Together: Example ``Advanced Build''}
+\label{sec:advanced-build-example}
+
+A realistic advanced project combines these features:
+
+\begin{itemize}
+    \item \textbf{RC control:} dual sticks + knobs for driving and camera/arm control
+    \item \textbf{MCP23017:} many switches and indicators using I2C expansion
+    \item \textbf{Telemetry:} battery + current plots, plus panels for temperature and distance
+\end{itemize}
+
+This creates a robust operator experience: control remains responsive, while telemetry provides
+situational awareness and early warning of battery sag, motor stalls, or sensor faults.

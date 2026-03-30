@@ -1,0 +1,153 @@
+\chapter{Example Projects}
+\label{ch:example-projects}
+
+This chapter presents practical, real-life example projects that combine the two parts of the system:
+
+\begin{itemize}
+    \item \textbf{EmitterApp (Android)}: provides the operator interface (dual joysticks, switches, knobs, event buttons) plus live telemetry widgets (panels, LED indicators, analog/battery indicators, and plots).
+    \item \textbf{ESP32\_BT\_Controller (ESP32, C/C++)}: runs on the robot/controller hardware, receives RC commands over Bluetooth (SPP) and sends configuration + telemetry back to the app.
+\end{itemize}
+
+The goal of each example is to show (1) how the controls map to real hardware and (2) what telemetry is useful during operation.
+
+\section{RC Car (Differential Drive)}
+\label{sec:example-rc-car}
+
+A common real-world build is a small \textbf{two-wheel differential drive} RC car/rover (two DC motors + motor driver). This is the simplest project that benefits immediately from the dual-stick interface.
+
+\subsection*{Typical hardware}
+\begin{itemize}
+    \item ESP32 development board
+    \item Dual H-bridge motor driver (e.g., TB6612FNG, DRV8833, L298N)
+    \item 2 DC motors + chassis + battery
+    \item Optional: battery voltage sensor (ADC divider)
+\end{itemize}
+
+\subsection*{Control mapping (practical)}
+\begin{itemize}
+    \item \textbf{Left stick Y}: throttle (forward/backward).
+    \item \textbf{Left stick X}: steering (turn left/right) \emph{or} “arcade mix” (throttle + steering combined into left/right motor speeds).
+    \item \textbf{Switch 1}: arm/disarm motors (safety).
+    \item \textbf{Knob}: max speed limiter (useful for indoor driving or training).
+    \item \textbf{Event button}: horn/buzzer pulse (short audible feedback).
+\end{itemize}
+
+\subsection*{Telemetry that matters in real life}
+\begin{itemize}
+    \item \textbf{Battery indicator}: prevents over-discharging the pack.
+    \item \textbf{Panels}: show left/right motor command or measured wheel speed (if encoders exist).
+    \item \textbf{Plot}: battery voltage over time (sag under load shows when you are near depletion).
+\end{itemize}
+
+\subsection*{Real-life use case}
+Indoor navigation practice, basic robotics teaching labs, or a workshop demo car where operators can \textit{feel} the difference between control modes (spring vs hold) while watching battery and load effects on the plot.
+
+\section{Camera Control Platform (Pan/Tilt Head)}
+\label{sec:example-camera-platform}
+
+A pan/tilt platform is a realistic project used for inspection, streaming, or robotics vision experiments. It is also a good example of mixing \textbf{continuous control} and \textbf{fine adjustment}.
+
+\subsection*{Typical hardware}
+\begin{itemize}
+    \item ESP32 development board
+    \item 2 servos (pan + tilt) or a small gimbal
+    \item Camera (action camera, small FPV camera, phone mount, etc.)
+    \item Optional: LED light for illumination
+\end{itemize}
+
+\subsection*{Control mapping (practical)}
+\begin{itemize}
+    \item \textbf{Right stick X}: camera pan.
+    \item \textbf{Right stick Y}: camera tilt.
+    \item \textbf{Knob}: servo speed/smoothing (slow cinematic motion vs fast tracking).
+    \item \textbf{Switch}: toggle LED light (on/off).
+    \item \textbf{Event button}: “center camera” action (send a short event to reset angles).
+\end{itemize}
+
+\subsection*{Telemetry that matters in real life}
+\begin{itemize}
+    \item \textbf{Analog indicator}: current pan angle or “target pan angle”.
+    \item \textbf{Panel}: tilt angle or a named mode (e.g., \textit{TRACK} vs \textit{LOCK}).
+    \item \textbf{LED indicators}: show whether the platform is centered, tracking, or in a warning state.
+\end{itemize}
+
+\subsection*{Real-life use case}
+Home inspection (looking under furniture, ceilings), robotics vision tuning (point the camera while adjusting lighting), or a workshop live demo where one person drives and another controls the camera.
+
+\section{Sensor Rover (Telemetry-First Build)}
+\label{sec:example-sensor-rover}
+
+A sensor rover emphasizes \textbf{measurement and feedback} more than speed. The ESP32 reads sensors and streams telemetry back to the Android device where the operator sees panels and time-series plots.
+
+\subsection*{Typical hardware}
+\begin{itemize}
+    \item ESP32 development board
+    \item Distance sensor (ultrasonic or ToF)
+    \item Environmental sensor (temperature/humidity/pressure) over I2C
+    \item Optional: MCP23017 I2C GPIO expander (if you need more IO)
+    \item Rover chassis (2WD or 4WD)
+\end{itemize}
+
+\subsection*{Control mapping (practical)}
+\begin{itemize}
+    \item \textbf{Left stick}: slow drive (precision).
+    \item \textbf{Switches}: toggle sensor modes (e.g., fast/slow sampling, logging on/off).
+    \item \textbf{Knob}: sampling rate or alert threshold (e.g., distance warning limit).
+\end{itemize}
+
+\subsection*{Telemetry that matters in real life}
+\begin{itemize}
+    \item \textbf{Left panel}: distance (cm) to obstacle.
+    \item \textbf{Right panel}: temperature (\(^\circ\)C) or humidity (\%).
+    \item \textbf{Plots}: distance and/or voltage trends (useful for diagnosing noise, sensor dropouts, or power issues).
+    \item \textbf{Battery indicator}: critical for longer experiments.
+\end{itemize}
+
+\subsection*{Real-life use case}
+Environmental mapping (walk the rover around a room to see temperature gradients), obstacle-distance experiments for autonomous driving prototypes, or demonstration of telemetry-driven operation where the plot reveals what is happening even when the robot is out of sight.
+
+\section{Custom Robotics Platform (Modular, Expandable)}
+\label{sec:example-custom-robot}
+
+A more advanced real-world project is a \textbf{modular robot} that mixes locomotion, actuators, and multiple accessory devices. This is where using both repositories together becomes especially valuable: the Android side offers a rich operator UI, and the ESP32 side can be adapted (pin mapping, modes, I2C expansion, telemetry sources).
+
+\subsection*{Typical hardware}
+\begin{itemize}
+    \item Drive base (tracked or wheeled)
+    \item Actuator (servo arm, linear actuator, gripper)
+    \item Lights + buzzer for feedback
+    \item Multiple sensors (battery monitoring, encoders, distance, IMU)
+    \item Optional: MCP23017 for extra switches/outputs
+\end{itemize}
+
+\subsection*{Example control mapping (practical)}
+\begin{itemize}
+    \item \textbf{Left stick}: drive.
+    \item \textbf{Right stick}: arm control (rotate + lift) \emph{or} camera control.
+    \item \textbf{Switches}: modes (arm enable, precision mode, lights).
+    \item \textbf{Knobs}: tuning (speed limit, grip force, servo trim).
+    \item \textbf{Event buttons}: discrete actions (open/close gripper, reset orientation, emergency stop).
+\end{itemize}
+
+\subsection*{Telemetry that matters in real life}
+\begin{itemize}
+    \item \textbf{Battery widget}: operator safety (stop before brownouts).
+    \item \textbf{Panels}: named signals such as \textit{ARM CURR}, \textit{IMU YAW}, \textit{GRIP STATE}.
+    \item \textbf{LEDs}: quick status (armed, warning, fault, link ok).
+    \item \textbf{Plot}: one or more signals over time (e.g., current draw vs motor command to detect stalls).
+\end{itemize}
+
+\subsection*{Real-life use case}
+Maker projects and robotics clubs: one base platform can be reused for different events (sumo bot, inspection bot, outreach demo) by changing firmware configuration (pins/features) and reusing the same Android control screen.
+
+\section{Project Planning Checklist (Recommended)}
+\label{sec:planning-checklist}
+
+Before building, decide:
+
+\begin{itemize}
+    \item \textbf{Controls}: what each joystick axis, switch, knob, and button should do.
+    \item \textbf{Safety}: an arm/disarm switch and an emergency-stop event is strongly recommended.
+    \item \textbf{Telemetry}: pick 2--4 key values that make operation safer (battery, distance, motor current, temperature).
+    \item \textbf{Expansion}: whether you need I2C devices (sensors, MCP23017) to scale IO.
+\end{itemize}

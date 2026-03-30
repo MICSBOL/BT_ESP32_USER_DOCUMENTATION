@@ -1,0 +1,194 @@
+\chapter{Uploading the Firmware}
+
+This chapter explains how to install the development environment and upload the firmware to the ESP32 microcontroller. The firmware enables Bluetooth communication with the mobile application and provides the control logic for motors, servos, sensors, and telemetry.
+
+The procedure uses the Arduino IDE, which provides a simple environment for compiling and uploading firmware to ESP32 development boards.
+
+\section{Install the Arduino IDE}
+
+Download and install the Arduino IDE from the official website:
+
+\begin{center}
+	\url{https://www.arduino.cc/en/software}
+\end{center}
+
+Both Arduino IDE 1.8.x and Arduino IDE 2.x are supported, but Arduino IDE 2.x is recommended because it provides improved performance and a modern user interface.
+
+After installing the software, launch the Arduino IDE to continue with the ESP32 configuration.
+
+\section{Install ESP32 Board Support}
+
+The Arduino IDE requires the ESP32 board package in order to compile firmware for ESP32 microcontrollers.
+
+Open the Arduino IDE and navigate to:
+
+\begin{verbatim}
+	File -> Preferences
+\end{verbatim}
+
+Locate the field labeled \textbf{Additional Boards Manager URLs} and add the following address:
+
+\begin{verbatim}
+	https://dl.espressif.com/dl/package_esp32_index.json
+\end{verbatim}
+
+Press \textbf{OK} to save the configuration.
+
+Next install the ESP32 board definitions:
+
+\begin{verbatim}
+	Tools -> Board -> Boards Manager
+\end{verbatim}
+
+Search for:
+
+\begin{verbatim}
+	ESP32 by Espressif Systems
+\end{verbatim}
+
+Install the board package.
+
+For best compatibility with this project the following version is recommended:
+
+\begin{verbatim}
+	ESP32 Core Version 2.0.x
+\end{verbatim}
+
+This version provides stable Bluetooth support and works well with the firmware architecture used in this project.
+
+\section{Download the Firmware}
+
+Download the project source code from the GitHub repository:
+
+\begin{center}
+	\url{https://github.com/MICSBOL/ESP32_BT_Controller}
+\end{center}
+
+You can download the project by clicking the \textbf{Code} button and selecting \textbf{Download ZIP}, or by cloning the repository using Git.
+
+After downloading the project, extract the files to a folder on your computer.
+
+\section{Open the Firmware Project}
+
+Open the Arduino IDE and select:
+
+\begin{verbatim}
+	File -> Open
+\end{verbatim}
+
+Navigate to the folder containing the firmware and open the main project file:
+
+\begin{verbatim}
+	ESP32_BT_Controller.ino
+\end{verbatim}
+
+When the file is opened, the Arduino IDE will automatically load all additional source files used by the firmware, including the modular components responsible for control logic, communication, telemetry, and hardware interfaces.
+
+\section{Select the ESP32 Board}
+
+Configure the board type used for compilation.
+
+Navigate to:
+
+\begin{verbatim}
+	Tools -> Board
+\end{verbatim}
+
+Select:
+
+\begin{verbatim}
+	ESP32 Dev Module
+\end{verbatim}
+
+This configuration is compatible with most ESP32 development boards available on the market.
+
+\section{Configure Board Parameters}
+
+For reliable operation it is recommended to use the following board configuration:
+
+\begin{itemize}
+
+	\item Board: ESP32 Dev Module
+
+	\item Upload Speed: 921600
+
+	\item CPU Frequency: 240 MHz
+
+	\item Flash Frequency: 80 MHz
+
+	\item Flash Mode: QIO
+
+	\item Flash Size: 4MB
+
+	\item Partition Scheme: Default 4MB
+
+	\item Core Debug Level: None
+
+	\item PSRAM: Disabled
+
+\end{itemize}
+
+These settings ensure stable compilation and firmware upload for most ESP32 boards.
+
+\section{Connect the ESP32 Board}
+
+Connect the ESP32 development board to your computer using a USB cable.
+
+After connecting the board, select the serial port used by the device:
+
+\begin{verbatim}
+	Tools -> Port
+\end{verbatim}
+
+Typical port names include:
+
+\begin{verbatim}
+	COM3
+	COM4
+	/dev/ttyUSB0
+	/dev/ttyACM0
+\end{verbatim}
+
+Select the port corresponding to your ESP32 device.
+
+\section{Compile the Firmware}
+
+Before uploading the firmware it is recommended to verify that the code compiles correctly.
+
+Click the \textbf{Verify} button in the Arduino IDE.
+
+The IDE will compile all source files used by the project. If the compilation completes successfully the console will display a message indicating the memory usage of the program.
+
+\section{Upload the Firmware}
+
+Click the \textbf{Upload} button to transfer the compiled firmware to the ESP32.
+
+During the upload process the IDE will compile the firmware and send it to the microcontroller through the USB connection.
+
+Some ESP32 boards require pressing the \textbf{BOOT} button when the upload begins. If the upload fails, hold the BOOT button while the firmware is being uploaded.
+
+After the upload finishes the IDE will display a message indicating that the ESP32 is restarting.
+
+\section{Verify Firmware Operation}
+
+Open the Serial Monitor to confirm that the firmware is running.
+
+Navigate to:
+
+\begin{verbatim}
+	Tools -> Serial Monitor
+\end{verbatim}
+
+Set the serial communication speed to:
+
+\begin{verbatim}
+	115200
+\end{verbatim}
+
+When the ESP32 starts you should see status messages printed to the console indicating that the Bluetooth controller has started and is ready to accept connections from the mobile application.
+
+\section{Next Step}
+
+After the firmware has been uploaded successfully, the next step is to connect the mobile application to the ESP32 and begin controlling the device.
+
+The connection process is described in Chapter 5.

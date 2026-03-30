@@ -1,0 +1,46 @@
+\chapter{Hardware Setup}
+
+\section{ESP32 Board}
+
+The ESP32 acts as the main controller for the system. It receives commands from the Android application via Bluetooth and controls the connected hardware.
+
+Typical ESP32 development boards include:
+
+\begin{itemize}
+	\item ESP32 DevKit
+	\item ESP32-WROOM boards
+	\item ESP32 NodeMCU boards
+\end{itemize}
+
+\section{Motor Driver Connection}
+
+Motors cannot be powered directly from the ESP32 pins. A motor driver is required.
+
+The motor driver receives control signals from the ESP32 and supplies power to the motors.
+
+Typical connections include:
+
+\begin{itemize}
+	\item Motor direction pins
+	\item PWM speed control pins
+	\item Power input
+	\item Motor outputs
+\end{itemize}
+
+\section{Servo Connections}
+
+Servo motors can be connected directly to the ESP32 PWM pins.
+
+Servos can be used for:
+
+\begin{itemize}
+	\item Steering
+	\item Camera pan control
+	\item Robotic arms
+\end{itemize}
+
+\section{Power Supply}
+
+Motors and the ESP32 should be powered from an appropriate battery or power supply.
+
+Always ensure that all devices share a common ground connection.

@@ -1,0 +1,72 @@
+\chapter{Wiring Diagrams}
+
+This chapter shows basic wiring examples for common projects using the ESP32 RC Controller firmware.
+
+These diagrams are simplified so beginners can quickly understand how to connect the hardware.
+
+\section{Basic Robot Wiring}
+
+The most common project is a simple differential drive robot using two motors.
+
+\begin{center}
+	\begin{tikzpicture}[
+		block/.style={draw, rectangle, minimum width=3cm, minimum height=1cm},
+		line/.style={->, thick}
+		]
+
+		\node[block] (phone) {Android App};
+		\node[block, right=3cm of phone] (esp32) {ESP32};
+		\node[block, right=3cm of esp32] (driver) {Motor Driver};
+		\node[block, above right=1cm and 1.5cm of driver] (motor1) {Left Motor};
+		\node[block, below right=1cm and 1.5cm of driver] (motor2) {Right Motor};
+
+		\draw[line] (phone) -- node[above]{Bluetooth} (esp32);
+		\draw[line] (esp32) -- node[above]{Control Signals} (driver);
+		\draw[line] (driver) -- (motor1);
+		\draw[line] (driver) -- (motor2);
+
+	\end{tikzpicture}
+\end{center}
+
+\section{Servo Control Example}
+
+Servos can be connected directly to PWM pins on the ESP32.
+
+\begin{itemize}
+	\item Servo signal → ESP32 GPIO pin
+	\item Servo power → 5V supply
+	\item Servo ground → common ground
+\end{itemize}
+
+Example uses:
+
+\begin{itemize}
+	\item Steering control
+	\item Camera pan control
+	\item Robotic arm joints
+\end{itemize}
+
+\section{LED and Buzzer Outputs}
+
+Digital outputs can control LEDs or buzzers.
+
+Example connections:
+
+\begin{itemize}
+	\item GPIO pin → LED (with resistor)
+	\item GPIO pin → buzzer module
+\end{itemize}
+
+These outputs can be controlled using buttons or switches in the Android application.
+
+\section{Sensor Connections}
+
+Sensors can be connected using:
+
+\begin{itemize}
+	\item Analog inputs
+	\item Digital inputs
+	\item I2C interface
+\end{itemize}
+
+The firmware allows sensor data to be transmitted to the Android application using telemetry.

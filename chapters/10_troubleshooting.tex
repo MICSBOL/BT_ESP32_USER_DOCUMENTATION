@@ -1,0 +1,179 @@
+\chapter{Troubleshooting}
+\label{ch:troubleshooting}
+
+If your project does not work as expected, this chapter helps you identify common problems on
+\textbf{both sides of the system}:
+
+\begin{itemize}
+    \item \textbf{Android (EmitterApp):} UI controls, Bluetooth pairing/connection, and whether commands/telemetry are being processed.
+    \item \textbf{ESP32 (ESP32\_BT\_Controller):} firmware upload, pin wiring, power integrity, Bluetooth SPP link, and telemetry generation.
+\end{itemize}
+
+\section{Before You Start: Quick Checklist}
+\label{sec:quick-checklist}
+
+\begin{itemize}
+    \item Confirm the ESP32 is powered and stable (no brownouts/resets).
+    \item Confirm your Android device is paired to the correct Bluetooth name (default is \texttt{ESP32-BT}).
+    \item Keep the phone within a few meters for initial testing.
+    \item Ensure \textbf{all grounds are common} (ESP32, motor driver, sensors, external 5V/servo supply).
+    \item If you are using boot-sensitive pins (e.g., GPIO0), disconnect external circuits temporarily during flashing.
+\end{itemize}
+
+\section{ESP32 Firmware Does Not Upload}
+\label{sec:esp32-upload}
+
+If firmware does not upload correctly:
+
+\begin{itemize}
+    \item Verify the correct board/target is selected in your IDE/tooling.
+    \item Confirm the correct serial port is selected.
+    \item Try a different USB cable (many ``charge-only'' cables cause upload failures).
+    \item Press and hold \textbf{BOOT} during upload if your board requires manual bootloader entry.
+    \item Disconnect external wiring from \textbf{boot-strap pins} during flashing (common offenders include GPIO0 and GPIO2).
+\end{itemize}
+
+\subsection*{Boot-strap pin notes (important)}
+The firmware pin configuration uses GPIO0 as a digital indicator input (\texttt{PIN\_IND4 = GPIO0}) in
+\texttt{FULL\_RC\_MODE}. GPIO0 is a boot pin: external pull-ups/pull-downs can prevent boot or flashing.
+If flashing fails, unplug anything connected to GPIO0, flash again, then reconnect.
+
+\section{ESP32 Powers On but Resets Randomly}
+\label{sec:esp32-resets}
+
+Random resets are usually power-related:
+
+\begin{itemize}
+    \item Motors/servos can pull voltage down suddenly. Use a dedicated regulator for the ESP32 and a separate supply for motors/servos.
+    \item Ensure the ESP32 supply can provide peak current (Wi-Fi/Bluetooth bursts can cause dips).
+    \item Add bulk capacitance near motor drivers/servo rails (e.g., 470--1000~\(\mu\)F) and a smaller ceramic capacitor near the ESP32.
+    \item Check for overheating regulators on dev boards when powering servos from the same 5V rail (not recommended).
+\end{itemize}
+
+\section{Bluetooth Pairing and Connection Problems (Android \texorpdfstring{$\leftrightarrow$}{<->} ESP32)}
+\label{sec:bluetooth-problems}
+
+\subsection*{Symptom: Device not visible in scan}
+\begin{itemize}
+    \item Confirm the ESP32 is powered and running (LED/activity indicators if available).
+    \item Ensure the phone is close to the ESP32.
+    \item Power-cycle the ESP32.
+\end{itemize}
+
+\subsection*{Symptom: Pairing asks for PIN or fails}
+The default PIN is commonly \texttt{1234}.
+\begin{itemize}
+    \item Remove (``forget'') the device in Android Bluetooth settings, then pair again.
+    \item Try pairing in Android system settings first, then connect from the app.
+\end{itemize}
+
+\subsection*{Symptom: App says ``Connected'' but controls do nothing}
+\begin{itemize}
+    \item Verify you connected to the correct device (if multiple \texttt{ESP32-BT} devices exist nearby).
+    \item Confirm the ESP32 is running the expected firmware build (not an old sketch).
+    \item On the ESP32 side, use serial logging (if enabled) to confirm command packets are arriving.
+\end{itemize}
+
+\subsection*{Symptom: Connects, then disconnects repeatedly}
+\begin{itemize}
+    \item This is often a \textbf{power stability} problem on the ESP32 (see Section~\ref{sec:esp32-resets}).
+    \item Reduce motor/servo load during initial testing (disconnect motors, test with LEDs first).
+    \item Keep the phone close, and avoid metal enclosures that shield Bluetooth.
+\end{itemize}
+
+\section{Controls Feel Wrong in the App (Android Side)}
+\label{sec:android-controls}
+
+\subsection*{Joystick returns to center vs stays in place}
+EmitterApp supports different joystick modes (for example spring vs hold). If the robot behaves
+as if throttle is ``not staying'' or steering is ``stuck'':
+
+\begin{itemize}
+    \item Check the selected stick modes in the app settings.
+    \item For throttle, many users prefer a \textbf{hold} behavior; for steering, many prefer \textbf{spring}.
+\end{itemize}
+
+\subsection*{Buttons/switches appear but do not affect hardware}
+\begin{itemize}
+    \item Confirm that the ESP32 firmware maps those channels to real pins/outputs in your chosen project mode.
+    \item If you use \texttt{FULL\_RC\_MODE\_MCP}, verify MCP23017 wiring and I2C address configuration (default address \texttt{0x20}).
+\end{itemize}
+
+\section{Motors Do Not Move}
+\label{sec:motors}
+
+\subsection*{Electrical checks}
+\begin{itemize}
+    \item Check motor driver power supply and polarity.
+    \item Confirm the driver \textbf{logic ground} is connected to ESP32 ground.
+    \item Confirm motor outputs are connected to the motor terminals (swap leads if direction is reversed).
+\end{itemize}
+
+\subsection*{Signal checks}
+\begin{itemize}
+    \item Confirm PWM pins match your wiring. In the default pin map, PWM channels include:
+    GPIO18/19/23/25/26/27.
+    \item Confirm direction pins are connected correctly:
+    \texttt{PIN\_MD\_LEFT = GPIO12} and \texttt{PIN\_MD\_RIGHT = GPIO15} (both should be kept low at boot).
+    \item If your driver needs two direction pins per motor (IN1/IN2), you must adapt the wiring/firmware accordingly.
+\end{itemize}
+
+\subsection*{Practical debugging tip}
+Test motor outputs with a simple ``LED + resistor'' on the PWM pin first (you should see brightness change with stick motion),
+then connect the motor driver.
+
+\section{Servo Does Not Respond or Jitters}
+\label{sec:servo}
+
+\begin{itemize}
+    \item Ensure the servo has a proper 5V supply (do \textbf{not} power medium/large servos from the ESP32 board).
+    \item Confirm servo ground is tied to ESP32 ground.
+    \item Verify the control signal is wired to a configured PWM output pin (e.g., GPIO23 or GPIO25).
+    \item If the servo jitters, add a better power supply and reduce electrical noise (shorter wires, capacitors, separate power rails).
+\end{itemize}
+
+\section{Telemetry Data Not Appearing in the App}
+\label{sec:telemetry}
+
+\subsection*{Symptom: Connected, but no telemetry widgets update}
+\begin{itemize}
+    \item Wait a few seconds after connecting: the ESP32 sends configuration to the app on first connect.
+    \item Verify the sensor is wired to the correct input type:
+    \begin{itemize}
+        \item Analog telemetry: use ADC1 pins (e.g., GPIO34/35/36/39 in \texttt{FULL\_RC\_MODE}).
+        \item Digital indicators: GPIO4/5/2/0 (note GPIO0 boot caution).
+        \item I2C sensors: SDA GPIO21, SCL GPIO22.
+    \end{itemize}
+    \item If you are using \texttt{FULL\_RC\_MODE\_MCP}, confirm the MCP23017 is detected and wired correctly.
+\end{itemize}
+
+\subsection*{Symptom: Telemetry is present but values look wrong}
+\begin{itemize}
+    \item Check sensor scaling (voltage dividers, ADC range, units).
+    \item Reduce noise: shorten analog wires, add filtering (RC filter), and avoid running analog lines alongside motor wires.
+\end{itemize}
+
+\section{I2C Devices Not Detected (MCP23017 or Sensors)}
+\label{sec:i2c}
+
+\begin{itemize}
+    \item Verify SDA is on GPIO21 and SCL on GPIO22 (per \texttt{pins.h}).
+    \item Confirm the device uses 3.3V logic (or use level shifting).
+    \item Check pull-up resistors on SDA/SCL (many breakout boards include them; too many pull-ups in parallel can also cause issues).
+    \item Confirm the I2C address (MCP23017 default in the repo is \texttt{0x20}).
+\end{itemize}
+
+\section{General Debugging Tips (Recommended Workflow)}
+\label{sec:debugging-tips}
+
+\begin{enumerate}
+    \item \textbf{Start with the link:} verify Bluetooth pairing and a stable connection first.
+    \item \textbf{Test outputs without motors:} LEDs on PWM/switch pins confirm the control path is working.
+    \item \textbf{Add one subsystem at a time:} motors, then servos, then sensors, then I2C expansion.
+    \item \textbf{Use logging:}
+    \begin{itemize}
+        \item ESP32: serial debug output (when enabled in the firmware).
+        \item Android: Check the indicators to confirm connection state and incoming telemetry.
+    \end{itemize}
+    \item \textbf{Treat power as a first-class component:} most intermittent failures come from undervoltage or noisy supplies.
+\end{enumerate}

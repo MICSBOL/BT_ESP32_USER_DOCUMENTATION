@@ -1,0 +1,697 @@
+\chapter{Connecting the Android Application}
+
+\section{Install the Application}
+
+Install the RC Controller Android application on your smartphone.
+
+\section{Enable Bluetooth}
+
+Make sure Bluetooth is enabled on your phone.
+
+\section{Connect to the ESP32}
+
+Open the RC Controller App and select the ESP32 device from the list of available Bluetooth devices.
+
+Once connected, the control interface will appear on the screen.
+
+\section{Connection Status}
+
+The application will display the connection status.
+
+If the connection is successful, control commands can be sent to the ESP32.
+
+\section{Debug Mode (Viewing Bluetooth Communication)}
+
+The firmware includes an optional debug system that allows users to monitor the communication between the Android application and the ESP32.
+
+This feature is useful when troubleshooting connection problems or verifying that commands from the application are being received correctly.
+
+\subsection{Enable Debug Mode}
+
+Open the file:
+
+\begin{verbatim}
+	debug_config.h
+\end{verbatim}
+
+Inside this file you will find a configuration flag for enabling debug output.
+
+Enable debugging by setting the flag to:
+
+\begin{verbatim}
+	#define DEBUG_ENABLED 1
+\end{verbatim}
+
+If debugging is disabled, the value will typically be:
+
+\begin{verbatim}
+	#define DEBUG_ENABLED 0
+\end{verbatim}
+
+After changing this value, upload the firmware again to the ESP32.
+
+\subsection{Open the Serial Monitor}
+
+Open the Arduino Serial Monitor:
+
+\begin{verbatim}
+	Tools -> Serial Monitor
+\end{verbatim}
+
+Set the baud rate to:
+
+\begin{verbatim}
+	115200
+\end{verbatim}
+
+Restart the ESP32 to view the startup messages.
+
+\subsection{Debug Output}
+
+When debug mode is enabled the ESP32 will print diagnostic messages to the Serial Monitor.
+
+Typical messages may include:
+
+\begin{verbatim}
+	[DEBUG] Bluetooth initialized
+	[DEBUG] Waiting for client connection
+	[DEBUG] Client connected
+\end{verbatim}
+
+When commands are received from the Android application, the ESP32 may display messages similar to:
+
+\begin{verbatim}
+	[DEBUG] Received command: BTN_A
+	[DEBUG] Joystick X: 120
+	[DEBUG] Joystick Y: 85
+\end{verbatim}
+
+These messages confirm that the Bluetooth communication between the smartphone and the ESP32 is working correctly.
+
+\subsection{Troubleshooting Using Debug Mode}
+
+If the Android application connects but the robot does not respond:
+
+\begin{itemize}
+	\item Verify that debug messages appear when pressing buttons in the application.
+	\item If no messages appear, the ESP32 may not be receiving Bluetooth data.
+	\item Check that the correct ESP32 device is selected in the application.
+	\item Verify that the firmware was uploaded successfully.
+\end{itemize}
+
+If debug messages appear but the hardware does not respond, the issue is likely related to the wiring or pin configuration.
+
+\section{Using Debug Mode to Verify Communication}
+
+The firmware includes a built-in debugging system that allows the user to see the data being received from the Android application.
+
+This is extremely useful when verifying that the Bluetooth connection is working correctly and that the ESP32 is receiving control commands.
+
+All debug messages are displayed in the Arduino IDE Serial Monitor.
+
+\subsection{Step 1: Enable Debug Mode}
+
+Open the file:
+
+\begin{verbatim}
+	debug_config.h
+\end{verbatim}
+
+Locate the following line:
+
+\begin{verbatim}
+	#define DEBUG_ENABLED 1
+\end{verbatim}
+
+Set the value to:
+
+\begin{itemize}
+	\item \texttt{1} to enable debug output
+	\item \texttt{0} to disable debug output
+\end{itemize}
+
+When debugging is enabled, the firmware will print control data received from the Android application.
+
+Upload the firmware again after making any changes.
+
+\subsection{Step 2: Open the Serial Monitor}
+
+In the Arduino IDE open:
+
+\begin{verbatim}
+	Tools -> Serial Monitor
+\end{verbatim}
+
+Set the baud rate to:
+
+\begin{verbatim}
+	115200
+\end{verbatim}
+
+Restart the ESP32 or press the reset button.
+
+The Serial Monitor will begin displaying debug messages.
+
+\subsection{Step 3: Move Controls in the App}
+
+After connecting the Android application to the ESP32, move the controls on the screen:
+
+\begin{itemize}
+	\item Move the joysticks
+	\item Rotate knobs
+	\item Toggle switches
+	\item Press buttons
+\end{itemize}
+
+The ESP32 will print the received data in the Serial Monitor.
+
+\section{Debug Output Types}
+
+The debug system can print different categories of information depending on the configuration in \texttt{debug\_config.h}.
+
+\subsection{Joystick Debug (Sticks)}
+
+If the following option is enabled:
+
+\begin{verbatim}
+	#define DBG_STICKS 1
+\end{verbatim}
+
+The ESP32 will print the joystick positions when they change.
+
+Example output:
+
+\begin{verbatim}
+	L Stick X: 512    L Stick Y: 510
+	L Stick X: 650    L Stick Y: 480
+	
+	R Stick X: 300    R Stick Y: 700
+\end{verbatim}
+
+These values represent the position of the left and right joystick on the Android application.
+
+Typical range:
+
+\begin{itemize}
+	\item Minimum: around 0
+	\item Center: around 512
+	\item Maximum: around 1023
+\end{itemize}
+
+If the numbers change when you move the joystick, the communication is working correctly.
+
+\subsection{Knob Debug}
+
+If the following option is enabled:
+
+\begin{verbatim}
+	#define DBG_KNOBS 1
+\end{verbatim}
+
+The ESP32 will print knob values.
+
+Example output:
+
+\begin{verbatim}
+	Left Knob: 340
+	Left Knob: 512
+	Left Knob: 890
+	
+	Right Knob: 120
+	Right Knob: 780
+\end{verbatim}
+
+These values correspond to the knob rotation in the Android application.
+
+Knobs can be used to control parameters such as:
+
+\begin{itemize}
+	\item Motor speed
+	\item Servo angle
+	\item Light intensity
+	\item Camera tilt
+\end{itemize}
+
+\subsection{Switch Debug}
+
+If the following option is enabled:
+
+\begin{verbatim}
+	#define DBG_SWITCHES 1
+\end{verbatim}
+
+The ESP32 will display the switch status.
+
+Example output:
+
+\begin{verbatim}
+	Switch Byte: 0x05
+	S1 = ON
+	S2 = OFF
+	S3 = ON
+	S4 = OFF
+	S5 = OFF
+	S6 = OFF
+\end{verbatim}
+
+Each switch corresponds to a toggle button in the Android application.
+
+These switches are commonly used for:
+
+\begin{itemize}
+	\item Turning lights on and off
+	\item Activating relays
+	\item Changing driving modes
+	\item Enabling autonomous functions
+\end{itemize}
+
+\subsection{Event Debug}
+
+If the following option is enabled:
+
+\begin{verbatim}
+	#define DBG_EVENTS 1
+\end{verbatim}
+
+The ESP32 will print a message when an event packet arrives.
+
+Example output:
+
+\begin{verbatim}
+	--- EVENT PACKET (PRESS) ---
+	Event ID: 0x03
+	Checksum: 0x7A
+	--------------
+	
+\end{verbatim}
+
+Events are triggered when the user presses a button in the Android application.
+
+Typical uses include:
+
+\begin{itemize}
+	\item Activating a special function
+	\item Resetting a system
+	\item Triggering a sound or animation
+	\item Launching an action on the robot
+\end{itemize}
+
+\section{Debugging the Telemetry System}
+
+The firmware includes a telemetry system that allows the ESP32 to send
+real-time information back to the Android application.
+
+Telemetry can include:
+
+\begin{itemize}
+	\item Numeric values
+	\item Indicators
+	\item Real-time plots
+\end{itemize}
+
+For development and testing, the firmware provides a telemetry debug
+system that allows the user to simulate telemetry values using the
+Arduino Serial Monitor.
+
+This system is configured in the file:
+
+\begin{center}
+	\texttt{debug\_config.h}
+\end{center}
+
+Inside this file you can select the telemetry debug mode.
+
+\begin{verbatim}
+	#define DBG_NONE        0
+	#define DBG_PANEL       1
+	#define DBG_INDICATOR   2
+	#define DBG_PLOT        3
+	
+	#define TELEMETRY_DEBUG_MODE DBG_INDICATOR
+\end{verbatim}
+
+Only one debug mode should be active at a time.
+
+\subsection{Normal Operation}
+
+\begin{verbatim}
+	#define TELEMETRY_DEBUG_MODE DBG_NONE
+\end{verbatim}
+
+In this mode the ESP32 reads telemetry values from real hardware sensors.
+
+Examples include:
+
+\begin{itemize}
+	\item analog sensors
+	\item battery voltage measurement
+	\item digital inputs
+\end{itemize}
+
+This mode should be used when the robot is fully built.
+
+\subsection{Numeric Panel Debug Mode}
+
+\begin{verbatim}
+	#define TELEMETRY_DEBUG_MODE DBG_PANEL
+\end{verbatim}
+
+This mode allows testing the numeric telemetry panels without connecting
+any sensors.
+
+When this mode is enabled, values entered in the Arduino Serial Monitor
+are parsed and sent to the Android application as numeric panel telemetry.
+
+\subsubsection{Serial Monitor Input Format}
+
+Open the Arduino Serial Monitor and send values using the following format:
+
+\begin{verbatim}
+	LEFT_VALUE,RIGHT_VALUE
+\end{verbatim}
+
+Both values may include a decimal part.
+
+Example inputs:
+
+\begin{verbatim}
+	12.3,45.8
+	120.0,350.5
+	5,10
+\end{verbatim}
+
+\subsubsection{Value Conversion}
+
+The values entered in the Serial Monitor are internally converted to the
+telemetry format used by the firmware.
+
+Each value is multiplied by 10 and converted to an integer before being
+transmitted to the Android application.
+
+Examples:
+
+\begin{itemize}
+	\item 12.3 becomes 123
+	\item 45.8 becomes 458
+	\item 120.0 becomes 1200
+\end{itemize}
+
+On the Android side, the received integer value is divided by 10 to
+display the correct decimal value on the numeric panel.
+
+\subsubsection{Valid Range}
+
+The allowed range for each numeric value is:
+
+\begin{itemize}
+	\item 0.0 to 6553.5
+\end{itemize}
+
+This range corresponds to the maximum value that can be transmitted
+using a 16-bit unsigned integer with one decimal place of precision.
+
+\subsubsection{Example}
+
+If the following value is entered in the Serial Monitor:
+
+\begin{verbatim}
+	123.4,56.7
+\end{verbatim}
+
+The firmware will transmit:
+
+\begin{verbatim}
+	1234,567
+\end{verbatim}
+
+The Android application will then display:
+
+\begin{verbatim}
+	123.4   56.7
+\end{verbatim}
+
+on the left and right numeric panels respectively.
+
+This debug mode is useful for verifying the correct operation of the
+telemetry transmission and the Android user interface before connecting
+real sensors.
+
+
+\subsection{Indicator Debug Mode}
+
+\begin{verbatim}
+	#define TELEMETRY_DEBUG_MODE DBG_INDICATOR
+\end{verbatim}
+
+This mode allows testing indicator widgets.
+
+Send values through the Serial Monitor using this format:
+
+\begin{verbatim}
+	ANALOG_VALUE,BATTERY_LEVEL,DIGITAL_MASK
+\end{verbatim}
+
+Example:
+
+\begin{verbatim}
+	45,80,5
+\end{verbatim}
+
+Value ranges:
+
+\begin{itemize}
+	\item Analog value: 0 to 100
+	\item Battery level: 0 to 100
+	\item Digital mask: 0 to 255
+\end{itemize}
+
+The digital mask represents the state of digital indicators using bit flags.
+
+Example values:
+
+\begin{verbatim}
+	1
+	2
+	4
+	8
+\end{verbatim}
+
+Each value activates a different indicator.
+
+Multiple indicators can be activated by combining values.
+
+Example:
+
+\begin{verbatim}
+	3
+\end{verbatim}
+
+Binary representation:
+
+\begin{verbatim}
+	00000011
+\end{verbatim}
+
+This activates the first two indicators.
+
+\subsection{Plot Debug Mode}
+
+\begin{verbatim}
+	#define TELEMETRY_DEBUG_MODE DBG_PLOT
+\end{verbatim}
+
+This mode simulates three telemetry signals that are displayed as
+real-time graphs in the Android application.
+
+Send values using the Serial Monitor:
+
+\begin{verbatim}
+	VALUE1,VALUE2,VALUE3
+\end{verbatim}
+
+Example:
+
+\begin{verbatim}
+	10,40,80
+\end{verbatim}
+
+Valid range:
+
+\begin{itemize}
+	\item 0 to 255
+\end{itemize}
+
+These values will appear in the telemetry plots of the application.
+
+\subsection{How the Telemetry Debug System Works}
+
+The debug values are read by the module:
+
+\begin{center}
+	\texttt{telemetry\_source.cpp}
+\end{center}
+
+This module replaces real sensor values with values received through the
+Serial interface when a debug mode is active.
+
+Telemetry packets are created and transmitted by:
+
+\begin{center}
+	\texttt{telemetry.cpp}
+\end{center}
+
+This module builds telemetry packets and sends them to the Android
+application using Bluetooth.
+
+This architecture allows the telemetry interface to be tested without
+connecting any physical sensors.
+
+
+\section{Why Debug Mode is Important}
+
+Debug mode allows users to quickly verify that:
+
+\begin{itemize}
+	\item The Android application is connected
+	\item Bluetooth data is being received
+	\item Control values are changing correctly
+\end{itemize}
+
+If values appear in the Serial Monitor but the hardware does not respond, the issue is likely related to the hardware wiring or firmware configuration rather than the Bluetooth connection.
+
+\section{Customizing Telemetry Labels in the Android Application}
+
+The Android application automatically displays labels for telemetry
+values such as numeric panels, indicators, and plots.
+
+These labels are defined in the ESP32 firmware and sent to the
+application when the Bluetooth connection is established.
+
+This allows each project to customize the interface without modifying
+the Android application.
+
+\subsection{Where the Labels Are Defined}
+
+Telemetry labels are defined inside the file:
+
+\begin{center}
+	\texttt{telemetry.cpp}
+\end{center}
+
+Inside the function responsible for sending the telemetry configuration,
+you will find the following variables:
+
+\begin{verbatim}
+	const char* plotNames[] = { "Volts", "Amps", "RPMs" };
+	const char* panelNames[] = { "Left", "Right" };
+	const char* indicatorNames[] = { "Throttle", "Battery" };
+\end{verbatim}
+
+These arrays define the labels that appear in the Android application's
+RC screen.
+
+\subsection{Plot Labels}
+
+The \texttt{plotNames} array defines the names of the real-time graphs.
+
+Example:
+
+\begin{verbatim}
+	const char* plotNames[] = { "Volts", "Amps", "RPMs" };
+\end{verbatim}
+
+In the Android application this will create three plots labeled:
+
+\begin{itemize}
+	\item Volts
+	\item Amps
+	\item RPMs
+\end{itemize}
+
+You can rename them to match your sensors.
+
+Example for a robot car:
+
+\begin{verbatim}
+	const char* plotNames[] = { "Speed", "Motor Temp", "Battery Current" };
+\end{verbatim}
+
+\subsection{Numeric Panel Labels}
+
+The \texttt{panelNames} array defines the labels for the large numeric
+displays.
+
+Example:
+
+\begin{verbatim}
+	const char* panelNames[] = { "Left", "Right" };
+\end{verbatim}
+
+Typical uses include:
+
+\begin{itemize}
+	\item Motor speed
+	\item Distance
+	\item RPM
+	\item Temperature
+\end{itemize}
+
+Example modification:
+
+\begin{verbatim}
+	const char* panelNames[] = { "Motor RPM", "Battery Voltage" };
+\end{verbatim}
+
+Note: It's recommended to use a maximum of 12 characters. 
+
+\subsection{Indicator Labels}
+
+The \texttt{indicatorNames} array defines the labels for the indicator
+widgets.
+
+Example:
+
+\begin{verbatim}
+	const char* indicatorNames[] = { "Throttle", "Battery" };
+\end{verbatim}
+
+Possible uses include:
+
+\begin{itemize}
+	\item Throttle position
+	\item Battery level
+	\item Temperature
+	\item Signal strength
+\end{itemize}
+
+Example modification:
+
+\begin{verbatim}
+	const char* indicatorNames[] = { "Engine Load", "Battery Level" };
+\end{verbatim}
+
+\subsection{When the Labels Are Sent}
+
+The telemetry labels are transmitted only once after the Android
+application connects to the ESP32.
+
+The firmware sends a telemetry configuration packet that includes:
+
+\begin{itemize}
+	\item plot labels
+	\item numeric panel labels
+	\item indicator labels
+\end{itemize}
+
+After receiving this packet, the Android application automatically
+updates the RC screen interface.
+
+\subsection{Important Notes}
+
+\begin{itemize}
+	\item The number of labels must match the number of telemetry variables.
+	\item After modifying the labels you must upload the firmware again.
+	\item The Android application will update the labels automatically after reconnecting.
+\end{itemize}
+
+

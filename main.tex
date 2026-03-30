@@ -1,0 +1,107 @@
+\documentclass[a4paper,12pt]{report}
+
+% --- Encoding & Fonts ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{newtxtext,newtxmath}
+
+% --- Language ---
+%\usepackage[english,spanish,es-noshorthands]{babel}
+\usepackage[spanish,english]{babel}
+
+% --- Page Layout ---
+\usepackage[a4paper,left=2.5cm,right=2.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{parskip}
+\usepackage{setspace}
+
+% --- Graphics ---
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning, arrows.meta}
+\tikzset{
+	line/.style={->, thick},
+	box/.style={draw, rectangle, minimum width=3cm, minimum height=1cm}
+}
+
+% --- Code ---
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{circuitikz}
+\lstset{
+	language=C++,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	commentstyle=\color{gray},
+	stringstyle=\color{orange},
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=1,
+	numbersep=5pt,
+	frame=single,
+	breaklines=true,
+	tabsize=2
+}
+
+
+% --- Hyperlinks (ALWAYS LAST) ---
+\usepackage[hidelinks]{hyperref}
+\ctikzset{
+	bipole label style={font=\footnotesize}
+}
+%\ctikzset{
+%	switch end arrow={Triangle[length=1.5pt,width=1.5pt]},
+%	switch start arrow={Bar}
+%}
+
+\ctikzset{
+	bipoles/length=0.7cm,
+	bipoles/thickness=0.6,
+	switch end arrow={Triangle[length=1.5pt,width=1.5pt]},
+	switch start arrow={Bar},
+}
+\tikzset{
+	smallled/.style={led, scale=0.8}
+}
+\tikzset{
+	circuitikz/led arrow/.style={
+		->,
+		>=Triangle[length=1.2pt,width=1.2pt],
+		line width=0.2pt
+	}
+}
+\tikzset{
+    VCC33/.style={vcc, scale=1.8, font=\scriptsize},
+    VCC5/.style={vcc, scale=1.8,font=\scriptsize},
+    VCC12/.style={vcc, scale=1.8, font=\scriptsize},
+}
+\tikzset{
+    bigground/.style={ground, scale=2.5}
+}
+
+% --- Document ---
+\begin{document}
+
+	\tableofcontents
+	\newpage
+
+	\input{chapters/01_introduction}
+	\input{chapters/02_requirements}
+	\input{chapters/03_hardware_setup}
+	\input{chapters/04_firmware_upload}
+	\input{chapters/05_connecting_app}
+	\input{chapters/06_basic_controls}
+	\input{chapters/07_customizing_project}
+	\input{chapters/08_example_projects}
+	\input{chapters/09_wiring_diagrams}
+	\input{chapters/10_troubleshooting}
+	\input{chapters/11_advanced_features}
+	\input{chapters/12_practical_control_and_telemetry_examples}
+	\input{chapters/13_control_layer_and_hardware_abstraction}
+    \input{chapters/13_control_layer_and_hardware_abstraction_borrador}
+
+\end{document}
+
+
+
+

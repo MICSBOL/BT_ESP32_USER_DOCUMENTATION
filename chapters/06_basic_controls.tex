@@ -1,0 +1,98 @@
+\chapter{Basic Controls}
+\label{ch:basic-controls}
+
+This chapter describes the main operator controls available on the \textit{RC Screen}. The interface is organized into left and right controller sides plus a central telemetry area, allowing you to drive the robot while monitoring system status in real time.
+
+\section{RC Screen Layout}
+\label{sec:rc-layout}
+
+The RC Screen is composed of three main regions:
+
+\begin{itemize}
+    \item \textbf{Left Controller Side:} primary controls (joystick mode dependent), switches, knob, and a top status widget.
+    \item \textbf{Center Display:} a telemetry plot used to visualize live data.
+    \item \textbf{Right Controller Side:} secondary controls (joystick mode dependent), switches, knob, and a top status widget.
+\end{itemize}
+
+A background panel provides contrast for readability, and the screen is intended to be used in \textbf{landscape orientation} for ergonomic spacing.
+
+\section{Joystick Control}
+\label{sec:joystick-control}
+
+Each controller side includes a virtual joystick. The joystick behavior depends on the selected \textbf{stick mode} (configured in user settings):
+
+\begin{itemize}
+    \item \textbf{Spring mode:} the joystick returns to center when released (useful for momentary input such as steering or speed trim).
+    \item \textbf{Hold mode:} the joystick keeps its position when released (useful for sustained throttle or setpoints).
+    \item \textbf{Directional modes:} some configurations may emphasize horizontal vs.\ vertical control depending on the robot's requirements.
+\end{itemize}
+
+Typical joystick usage includes:
+
+\begin{itemize}
+    \item Forward/backward movement (throttle)
+    \item Left/right turning (steering)
+    \item Camera pan/tilt (when mapped to a gimbal)
+    \item Any continuous control channel required by the robot (e.g., setpoint control)
+\end{itemize}
+
+\section{Switches (Discrete Channels)}
+\label{sec:switches}
+
+Both left and right sides provide \textbf{toggle switches} for discrete control channels. Switches are intended for actions that are either \textit{on/off} or select between a small number of states, such as:
+
+\begin{itemize}
+    \item Enabling/disabling motors
+    \item Selecting drive modes (e.g., slow/normal/boost)
+    \item Turning auxiliary devices on/off (lights, pump, fan, etc.)
+\end{itemize}
+
+\section{Knobs (Analog Channels)}
+\label{sec:knobs}
+
+Each side also includes a \textbf{rotary knob} for analog adjustment. Knobs are useful for fine-tuning parameters while driving:
+
+\begin{itemize}
+    \item Steering sensitivity or trim
+    \item Speed limit
+    \item Camera zoom or focus (if supported)
+    \item PID gains or other tuning parameters (advanced setups)
+\end{itemize}
+
+\section{Center Buttons}
+\label{sec:center-buttons}
+
+The RC Screen includes \textbf{push buttons} near the center area (top and bottom per side). These are intended for quick actions that should be triggered immediately, for example:
+
+\begin{itemize}
+    \item Horn / buzzer
+    \item Reset / acknowledge
+    \item Take picture / start recording (camera payload)
+    \item Trigger an automated routine
+\end{itemize}
+
+\section{Indicators and Telemetry}
+\label{sec:telemetry}
+
+The interface provides several forms of feedback so the operator can monitor the system while controlling it:
+
+\begin{itemize}
+    \item \textbf{Analog Indicator (top-left widget):} displays a numeric value with a title (e.g., RPM, temperature, signal strength).
+    \item \textbf{Battery Status (top-right widget):} shows battery level with a title label.
+    \item \textbf{LED Indicators:} a set of LEDs for quick status cues (e.g., armed state, warnings, link status).
+    \item \textbf{Panel Indicators:} per-side panels showing a value, an on/off state, a color, and a title (useful for named telemetry channels).
+    \item \textbf{Center Plot:} a live plot showing one or more telemetry series over time.
+\end{itemize}
+
+These indicators help confirm command reception and allow the operator to detect issues such as low battery, loss of link, or sensor warnings early.
+
+\section{Summary}
+\label{sec:basic-controls-summary}
+
+In general:
+\begin{itemize}
+    \item Use \textbf{joysticks} for continuous motion control.
+    \item Use \textbf{switches and buttons} for discrete actions and mode changes.
+    \item Use \textbf{knobs} for fine-grained tuning.
+    \item Use \textbf{telemetry widgets and plots} to monitor system state while operating.
+\end{itemize}
