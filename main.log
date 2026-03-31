@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.29)  30 MAR 2026 19:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.29)  31 MAR 2026 16:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -355,15 +355,6 @@ Package: babel 2024/01/07 v24.1 The Babel package
 \bbl@readstream=\read3
 \bbl@dirlevel=\count285
 
-(/usr/share/texlive/texmf-dist/tex/generic/babel-spanish/spanish.ldf
-Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
-\es@quottoks=\toks29
-\es@quotdepth=\count286
-Package babel Info: Making " an active character on input line 570.
-Package babel Info: Making . an active character on input line 675.
-Package babel Info: Making < an active character on input line 722.
-Package babel Info: Making > an active character on input line 722.
-)
 (/usr/share/texlive/texmf-dist/tex/generic/babel-english/english.ldf
 Language: english 2017/06/06 v3.3r English support from the babel system
 Package babel Info: Hyphen rules for 'canadian' set to \l@english
@@ -372,14 +363,19 @@ Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
 (babel)             (\language80). Reported on input line 105.
 Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
 (babel)             (\language80). Reported on input line 108.
-))
-(/usr/share/texlive/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
-Package babel Info: Importing font and identification data for english
-(babel)             from babel-en.ini. Reported on input line 11.
 )
+(/usr/share/texlive/texmf-dist/tex/generic/babel-spanish/spanish.ldf
+Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
+\es@quottoks=\toks29
+\es@quotdepth=\count286
+))
 (/usr/share/texlive/texmf-dist/tex/generic/babel/locale/es/babel-spanish.tex
 Package babel Info: Importing font and identification data for spanish
 (babel)             from babel-es.ini. Reported on input line 11.
+)
+(/usr/share/texlive/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
+Package babel Info: Importing font and identification data for english
+(babel)             from babel-en.ini. Reported on input line 11.
 )
 (/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
@@ -696,7 +692,12 @@ File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
 \pgfarrowlength=\dimen282
 \pgfarrowwidth=\dimen283
 \pgfarrowlinewidth=\dimen284
-) (/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+)
+(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
+zlibrarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
 \lst@mode=\count311
 \lst@gtempboxa=\box65
 \lst@token=\toks43
@@ -733,10 +734,6 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 Package: circuitikz 2023/12/09{} The CircuiTikz circuit drawing package version
  1.6.6
 
-(/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
-zlibrarycalc.code.tex
-File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
-)
 (/usr/share/texlive/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tik
 zlibrarybending.code.tex
 File: tikzlibrarybending.code.tex 2023-01-15 v3.1.10 (3.1.10)
@@ -930,14 +927,17 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 \Hy@SectionHShift=\skip53
 )
 LaTeX Font Info:    Trying to load font information for T1+ntxtlf on input line
- 83.
+ 84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/newtx/t1ntxtlf.fd
 File: t1ntxtlf.fd 2021/05/24 v1.1 font definition file for T1/ntx/tlf
 )
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 83.
+(Font)              scaled to size 12.0pt on input line 84.
  (./main.aux
+LaTeX Info: Redefining \. on input line 7.
+LaTeX Info: Redefining \% on input line 7.
+
 
 LaTeX Warning: Label `sec:telemetry' multiply defined.
 
@@ -947,51 +947,51 @@ LaTeX Warning: Label `sec:telemetry' multiply defined.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 83.
+LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 84.
 LaTeX Font Info:    Trying to load font information for OML+ntxmi on input line
- 83.
+ 84.
  (/usr/share/texlive/texmf-dist/tex/latex/newtx/omlntxmi.fd
 File: omlntxmi.fd 2015/08/25 Fontinst v1.933 font definitions for OML/ntxmi.
 )
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 83.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 84.
 LaTeX Font Info:    Trying to load font information for U+ntxexa on input line 
-83.
+84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/newtx/untxexa.fd
 File: untxexa.fd 2012/04/16 Fontinst v1.933 font definitions for U/ntxexa.
 )
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 83.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 84.
 LaTeX Font Info:    Trying to load font information for LMS+ntxsy on input line
- 83.
+ 84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/newtx/lmsntxsy.fd
 File: lmsntxsy.fd 2016/07/02 Fontinst v1.933 font definitions for LMS/ntxsy.
 )
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 83.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 84.
 LaTeX Font Info:    Trying to load font information for LMX+ntxexx on input lin
-e 83.
+e 84.
 
 (/usr/share/texlive/texmf-dist/tex/latex/newtx/lmxntxexx.fd
 File: lmxntxexx.fd 2016/07/03 Fontinst v1.933 font definitions for LMX/ntxexx.
 )
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 83.
-LaTeX Font Info:    ... okay on input line 83.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 84.
+LaTeX Font Info:    ... okay on input line 84.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -1017,8 +1017,10 @@ e
 ))
 \c@mv@tabular=\count341
 \c@mv@boldtabular=\count342
-LaTeX Info: Command `\dddot' is already robust on input line 83.
-LaTeX Info: Command `\ddddot' is already robust on input line 83.
+LaTeX Info: Command `\dddot' is already robust on input line 84.
+LaTeX Info: Command `\ddddot' is already robust on input line 84.
+LaTeX Info: Redefining \. on input line 84.
+LaTeX Info: Redefining \% on input line 84.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1055,7 +1057,7 @@ LaTeX Info: Command `\ddddot' is already robust on input line 83.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \c@lstlisting=\count343
-Package hyperref Info: Link coloring OFF on input line 83.
+Package hyperref Info: Link coloring OFF on input line 84.
 (./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
@@ -1073,14 +1075,6 @@ LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
 (Font)              scaled to size 14.4pt on input line 16.
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
 (Font)              scaled to size 12.0pt on input line 31.
-LaTeX Font Info:    Trying to load font information for TS1+ntxtlf on input lin
-e 33.
-
-(/usr/share/texlive/texmf-dist/tex/latex/newtx/ts1ntxtlf.fd
-File: ts1ntxtlf.fd 2015/01/18 v1.0 fd file for TS1/ntxtlf
-)
-LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 33.
 LaTeX Font Info:    Trying to load font information for T1+ntxtt on input line 
 35.
 
@@ -1121,8 +1115,10 @@ Package pdftex.def Info: assets/mics_logo.pdf  used on input line 44.
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-di
-st/fonts/enc/dvips/newtx/ntx-ec-tlf.enc}{/usr/share/texmf/fonts/enc/dvips/tex-g
-yre/q-ts1.enc} <./assets/mics_logo.pdf>]) (./main.toc
+st/fonts/enc/dvips/newtx/ntx-ec-tlf.enc} <./assets/mics_logo.pdf>]) (./main.toc
+LaTeX Info: Redefining \. on input line 1.
+LaTeX Info: Redefining \% on input line 1.
+
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
@@ -1130,128 +1126,202 @@ been already used, duplicate ignored
 l.37 ... to Verify Communication}{16}{section.5.6}
                                                   % [1
 
-] [2] [3])
+] [2]
+Overfull \hbox (2.39996pt too wide) detected at line 97
+\T1/ntxtlf/m/n/12 10.10. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 131
+\T1/ntxtlf/m/n/12 12.10. 
+ []
+
+
+Overfull \hbox (0.60004pt too wide) detected at line 132
+\T1/ntxtlf/m/n/12 12.10.1. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 133
+\T1/ntxtlf/m/n/12 12.11. 
+ []
+
+
+Overfull \hbox (0.60004pt too wide) detected at line 134
+\T1/ntxtlf/m/n/12 12.11.1. 
+ []
+
+[3]
+Overfull \hbox (0.60004pt too wide) detected at line 135
+\T1/ntxtlf/m/n/12 12.11.2. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 136
+\T1/ntxtlf/m/n/12 12.12. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 137
+\T1/ntxtlf/m/n/12 12.13. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 138
+\T1/ntxtlf/m/n/12 12.14. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 139
+\T1/ntxtlf/m/n/12 12.15. 
+ []
+
+
+Overfull \hbox (2.39996pt too wide) detected at line 140
+\T1/ntxtlf/m/n/12 12.16. 
+ []
+
+)
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [4]
-(./chapters/01_introduction.tex
-Chapter 1.
+ [4] (./chapters/01_introduction.tex
+Cap\'{\i }tulo 1.
 [5
 
 ]) (./chapters/02_requirements.tex [6]
-Chapter 2.
+Cap\'{\i }tulo 2.
 ) (./chapters/03_hardware_setup.tex [7
 
 ]
-Chapter 3.
+Cap\'{\i }tulo 3.
+
+Overfull \hbox (18.52724pt too wide) in paragraph at lines 4--8
+[]\T1/ntxtlf/m/n/12 This chap-ter des-cri-bes the re-com-men-ded hard-wa-re se-
+tup for the \T1/ntxtlf/b/n/12 MICS-BO-L/ESP32_BT_Controller
+ []
+
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.8pt on input line 14.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 10.0pt on input line 15.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 7.3pt on input line 15.
+LaTeX Font Info:    Font shape `T1/ntxtt/m/n' will be
+(Font)              scaled to size 10.0pt on input line 15.
 [8
 
-]) (./chapters/04_firmware_upload.tex [9]
-Chapter 4.
-[10
-
-] [11] [12]) (./chapters/05_connecting_app.tex [13]
-Chapter 5.
+] [9]
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
-(Font)              scaled to size 14.4pt on input line 29.
-[14
+(Font)              scaled to size 8.8pt on input line 93.
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 14.4pt on input line 101.
+) (./chapters/04_firmware_upload.tex [10]
+Cap\'{\i }tulo 4.
+[11
 
-] [15] [16] [17] [18] [19] [20] [21] [22] [23])
-(./chapters/06_basic_controls.tex [24]
-Chapter 6.
+] [12] [13]) (./chapters/05_connecting_app.tex [14]
+Cap\'{\i }tulo 5.
+[15
+
+] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25])
+(./chapters/06_basic_controls.tex [26]
+Cap\'{\i }tulo 6.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
 (Font)              scaled to size 12.0pt on input line 4.
-[25
+[27
 
-] [26]) (./chapters/07_customizing_project.tex [27]
-Chapter 7.
-) (./chapters/08_example_projects.tex [28
+] [28]) (./chapters/07_customizing_project.tex [29]
+Cap\'{\i }tulo 7.
+) (./chapters/08_example_projects.tex [30
 
 ]
-Chapter 8.
-[29
+Cap\'{\i }tulo 8.
+[31
 
-] [30] [31] [32]) (./chapters/09_wiring_diagrams.tex [33]
-Chapter 9.
-
-Overfull \hbox (101.1845pt too wide) in paragraph at lines 28--29
- [] 
- []
-
+] [32] [33] [34]) (./chapters/09_wiring_diagrams.tex [35]
+Cap\'{\i }tulo 9.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 10.95pt on input line 46.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 55.
 Package textcomp Info: Symbol \textrightarrow not provided by
 (textcomp)             font family ntxtlf in TS1 encoding.
-(textcomp)             Default family used instead on input line 36.
-Package textcomp Info: Symbol \textrightarrow not provided by
-(textcomp)             font family ntxtlf in TS1 encoding.
-(textcomp)             Default family used instead on input line 37.
-Package textcomp Info: Symbol \textrightarrow not provided by
-(textcomp)             font family ntxtlf in TS1 encoding.
-(textcomp)             Default family used instead on input line 38.
-[34
-
-{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
-Package textcomp Info: Symbol \textrightarrow not provided by
-(textcomp)             font family ntxtlf in TS1 encoding.
-(textcomp)             Default family used instead on input line 56.
-Package textcomp Info: Symbol \textrightarrow not provided by
-(textcomp)             font family ntxtlf in TS1 encoding.
-(textcomp)             Default family used instead on input line 57.
-)
-(./chapters/10_troubleshooting.tex [35]
-Chapter 10.
-
-Overfull \hbox (1.66554pt too wide) in paragraph at lines 17--18
-[]\T1/ntxtlf/m/n/12 Confirm your An-droid de-vice is paired to the cor-rect Blu
-e-tooth name (de-fault is \T1/ntxtt/m/n/12 ESP32-BT\T1/ntxtlf/m/n/12 ). 
- []
-
+(textcomp)             Default family used instead on input line 78.
 [36
 
-] [37]
-Overfull \hbox (21.28566pt too wide) in paragraph at lines 116--118
-[]\T1/ntxtlf/m/n/12 Confirm di-rec-tion pins are con-nected cor-rectly: \T1/ntx
-tt/m/n/12 PIN_MD_LEFT = GPIO12 \T1/ntxtlf/m/n/12 and \T1/ntxtt/m/n/12 PIN_MD_RI
-GHT
+]
+Package textcomp Info: Symbol \textrightarrow not provided by
+(textcomp)             font family ntxtlf in TS1 encoding.
+(textcomp)             Default family used instead on input line 79.
+Package textcomp Info: Symbol \textrightarrow not provided by
+(textcomp)             font family ntxtlf in TS1 encoding.
+(textcomp)             Default family used instead on input line 80.
+Package textcomp Info: Symbol \textrightarrow not provided by
+(textcomp)             font family ntxtlf in TS1 encoding.
+(textcomp)             Default family used instead on input line 98.
+Package textcomp Info: Symbol \textrightarrow not provided by
+(textcomp)             font family ntxtlf in TS1 encoding.
+(textcomp)             Default family used instead on input line 99.
+) (./chapters/10_troubleshooting.tex [37{/usr/share/texmf/fonts/enc/dvips/cm-su
+per/cm-super-ts1.enc}]
+Cap\'{\i }tulo 10.
+
+Overfull \hbox (1.66554pt too wide) in paragraph at lines 17--18
+[]\T1/ntxtlf/m/n/12 Confirm your An-dro-id de-vi-ce is pai-red to the co-rrect 
+Blue-tooth na-me (de-fault is \T1/ntxtt/m/n/12 ESP32-BT\T1/ntxtlf/m/n/12 ). 
  []
 
-[38] [39]) (./chapters/11_advanced_features.tex [40]
-Chapter 11.
-[41
+[38
+
+] [39]
+Overfull \hbox (19.35722pt too wide) in paragraph at lines 116--118
+[]\T1/ntxtlf/m/n/12 Confirm di-rec-tion pins are con-nec-ted co-rrectly: \T1/nt
+xtt/m/n/12 PIN_MD_LEFT = GPIO12 \T1/ntxtlf/m/n/12 and \T1/ntxtt/m/n/12 PIN_MD_R
+IGHT
+ []
+
+[40]
+LaTeX Font Info:    Trying to load font information for TS1+ntxtlf on input lin
+e 143.
+ (/usr/share/texlive/texmf-dist/tex/latex/newtx/ts1ntxtlf.fd
+File: ts1ntxtlf.fd 2015/01/18 v1.0 fd file for TS1/ntxtlf
+)
+LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
+(Font)              scaled to size 12.0pt on input line 143.
+ [41{/usr/share/texmf/fonts/enc/dvips/tex-gyre/q-ts1.enc}])
+(./chapters/11_advanced_features.tex [42]
+Cap\'{\i }tulo 11.
+[43
 
 ]
-Overfull \hbox (9.93472pt too wide) in paragraph at lines 71--75
-\T1/ntxtlf/m/n/12 changes, it is re-trans-mit-ted re-peat-edly for a short pe-r
-iod (see \T1/ntxtt/m/n/12 resendWindow \T1/ntxtlf/m/n/12 and \T1/ntxtt/m/n/12 r
-esendInterval
- []
-
 LaTeX Font Info:    Trying to load font information for T1+txtt on input line 8
 2.
-(/usr/share/texlive/texmf-dist/tex/latex/txfonts/t1txtt.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/txfonts/t1txtt.fd
 File: t1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `T1/ntxtt/b/n' in size <12> not available
 (Font)              Font shape `T1/txtt/bx/n' tried instead on input line 82.
- [42{/usr/share/texlive/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
+ [44{/usr/share/texlive/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
 Overfull \hbox (19.96426pt too wide) in paragraph at lines 110--111
-\T1/ntxtlf/m/n/12 The MCP23017 adds 16 dig-i-tal I/O pins over I2C and is sup-p
-orted by the firmware (\T1/ntxtt/m/n/12 mcp_io.cpp/.h\T1/ntxtlf/m/n/12 ). 
+[]\T1/ntxtlf/m/n/12 The MCP23017 adds 16 di-gi-tal I/O pins over I2C and is sup
+-por-ted by the firm-wa-re (\T1/ntxtt/m/n/12 mcp_io.cpp/.h\T1/ntxtlf/m/n/12 ). 
+
  []
 
-[43]) (./chapters/12_practical_control_and_telemetry_examples.tex [44]
-Chapter 12.
+[45]) (./chapters/12_practical_control_and_telemetry_examples.tex [46]
+Cap\'{\i }tulo 12.
 LaTeX Font Info:    Font shape `T1/ntxtt/b/n' in size <14.4> not available
 (Font)              Font shape `T1/txtt/bx/n' tried instead on input line 23.
-[45
+[47
 
-] [46] [47] [48] [49]
-Overfull \hbox (77.40932pt too wide) in paragraph at lines 303--305
-[]\T1/ntxtlf/m/n/12 In nor-mal mode, bat-tery is read from an ADC pin and mappe
-d to a per-cent-age (see \T1/ntxtt/m/n/12 hwReadIndicatorBattery()
+] [48] [49] [50] [51]
+Overfull \hbox (77.1705pt too wide) in paragraph at lines 303--305
+[]\T1/ntxtlf/m/n/12 In nor-mal mo-de, bat-tery is read from an ADC pin and map-
+ped to a per-cen-ta-ge (see \T1/ntxtt/m/n/12 hwReadIndicatorBattery()
  []
 
-[50]
+[52]
 Overfull \hbox (73.95486pt too wide) in paragraph at lines 343--343
 []    \T1/ntxtt/m/n/12 uint8_t hwReadPlot1() { return map(analogRead(PIN_NUMERI
 C1), 0, 4095, 0, 255); }[] 
@@ -1269,48 +1339,41 @@ Overfull \hbox (92.85483pt too wide) in paragraph at lines 343--343
 _IND2), 0, 4095, 0, 255); }[] 
  []
 
-) (./chapters/13_control_layer_and_hardware_abstraction.tex [51]
-Chapter 13.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.8pt on input line 11.
-[52
+) (./chapters/13_control_layer_and_hardware_abstraction.tex [53]
+Cap\'{\i }tulo 13.
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 8.0pt on input line 84.
+[54
 
 ]
 LaTeX Font Info:    Font shape `T1/ntxtt/b/n' in size <17.28> not available
-(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 80.
- [53] [54]
-Overfull \hbox (42.45493pt too wide) in paragraph at lines 174--174
+(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 113.
+ [55] [56]
+Overfull \hbox (42.45493pt too wide) in paragraph at lines 207--207
 []    \T1/ntxtt/m/n/12 void halSetSteering(uint32_t value) { ledcWrite(PIN_PWM_
 STICK_LX, value); }[] 
  []
 
 
-Overfull \hbox (36.15494pt too wide) in paragraph at lines 174--174
+Overfull \hbox (36.15494pt too wide) in paragraph at lines 207--207
 []    \T1/ntxtt/m/n/12 void halSetLed(uint32_t value)      { ledcWrite(PIN_PWM_
 KNOB_L, value);  }[] 
  []
 
 
-Overfull \hbox (36.15494pt too wide) in paragraph at lines 174--174
+Overfull \hbox (36.15494pt too wide) in paragraph at lines 207--207
 []    \T1/ntxtt/m/n/12 void halSetBuzzer(uint32_t value)   { ledcWrite(PIN_PWM_
 KNOB_R, value);  }[] 
  []
 
-[55]) (./chapters/14_diagram_circuit.tex [56]
-Chapter 14.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 113.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 10.95pt on input line 273.
+[57]) (./chapters/14_diagram_circuit.tex [58]
+Cap\'{\i }tulo 14.
+[59
 
-Underfull \hbox (badness 1546) in paragraph at lines 503--503
-[]\T1/ntxtlf/m/n/12 Figure 14.1: []Suggested ESP32 pin as-sign-ment and pe-riph
--eral con-nec-tions for the
- []
-
-[57
-
-] [58]) [59] [60] (./main.aux)
+] [60]) [61] [62] (./main.aux
+LaTeX Info: Redefining \. on input line 7.
+LaTeX Info: Redefining \% on input line 7.
+)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
@@ -1319,17 +1382,23 @@ L3 programming layer <2020/03/25>
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: CB3E06D63E6FB8CF2E9B9AA281F72414;33568.
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: CB3E06D63E6FB8CF2E9B9AA281F72414;33568
+(rerunfilecheck)             After:  08BE298C8655B877BA668F373468A0F3;34680.
  ) 
 Here is how much of TeX's memory you used:
- 46734 strings out of 474222
- 1052734 string characters out of 5748733
+ 46730 strings out of 474222
+ 1052602 string characters out of 5748733
  2012975 words of memory out of 5000000
- 68101 multiletter control sequences out of 15000+600000
- 659522 words of font info for 190 fonts, out of 8000000 for 9000
+ 68086 multiletter control sequences out of 15000+600000
+ 679199 words of font info for 211 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,8n,97p,518b,1105s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,8n,97p,518b,1104s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/inter/Inter-Black.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/public/inter/Inter-Bold.pfb></usr/share/t
 exlive/texmf-dist/fonts/type1/public/inter/Inter-ExtraBold.pfb></usr/share/texl
@@ -1343,10 +1412,10 @@ st/fonts/type1/public/newtx/txmiaX.pfb></usr/share/texlive/texmf-dist/fonts/typ
 e1/public/newtx/txsys.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/new
 tx/ztmb.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/newtx/ztmr.pfb></
 usr/share/texlive/texmf-dist/fonts/type1/public/newtx/ztmri.pfb>
-Output written on main.pdf (61 pages, 3037391 bytes).
+Output written on main.pdf (63 pages, 3049692 bytes).
 PDF statistics:
- 1366 PDF objects out of 1440 (max. 8388607)
- 1232 compressed objects within 13 object streams
- 274 named destinations out of 1000 (max. 500000)
+ 1386 PDF objects out of 1440 (max. 8388607)
+ 1250 compressed objects within 13 object streams
+ 285 named destinations out of 1000 (max. 500000)
  1298 words of extra memory for PDF output out of 10000 (max. 10000000)
 

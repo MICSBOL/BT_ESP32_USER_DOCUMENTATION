@@ -1,54 +1,71 @@
 \chapter{Connecting the Android Application}
 
-\section{Install the Application}
+% Improved section text based on MICSBOL/ESP32_BT_Controller repository behavior.
+% Notes:
+% - Uses \verb|...| for filenames/macros to avoid underscore/math-mode issues with babel+hyperref.
+% - Debug flags reflect debug_config.h in the repository.
 
-Install the RC Controller Android application on your smartphone.
+\section{Install the Application}
+Install the RC Controller Android application on your smartphone using the distribution method provided
+by your project (APK, store link, or internal deployment).
 
 \section{Enable Bluetooth}
-
-Make sure Bluetooth is enabled on your phone.
+Enable Bluetooth on your phone before launching the app. On newer Android versions, the app may request
+additional permissions (for example ``Nearby devices'' or Location-related permissions) in order to scan
+for Bluetooth devices. Grant the requested permissions so the device list can be populated correctly.
 
 \section{Connect to the ESP32}
+Power the ESP32 and open the RC Controller app. From the list of available Bluetooth devices, select the
+ESP32 controller.
 
-Open the RC Controller App and select the ESP32 device from the list of available Bluetooth devices.
-
-Once connected, the control interface will appear on the screen.
+Once the connection is established, the control interface becomes active and the application begins sending
+control data to the ESP32 (joysticks, knobs, switches, and button events).
 
 \section{Connection Status}
+The application displays the connection status to confirm that a Bluetooth serial link is active.
 
-The application will display the connection status.
-
-If the connection is successful, control commands can be sent to the ESP32.
+On the firmware side, a connected client is detected using \verb|SerialBT.hasClient()| (used by the telemetry
+module). If the phone disconnects, the firmware returns to ``waiting'' state and the application must reconnect
+before control and telemetry resume.
 
 \section{Debug Mode (Viewing Bluetooth Communication)}
-
-The firmware includes an optional debug system that allows users to monitor the communication between the Android application and the ESP32.
-
-This feature is useful when troubleshooting connection problems or verifying that commands from the application are being received correctly.
+The firmware includes an optional debug system that prints decoded controller data to the USB Serial Monitor.
+This is the fastest way to confirm that:
+\begin{itemize}
+    \item the phone is connected to the correct ESP32 device,
+    \item packets are being received and decoded correctly, and
+    \item joystick/knob/switch values change when you move controls in the app.
+\end{itemize}
 
 \subsection{Enable Debug Mode}
-
 Open the file:
 
 \begin{verbatim}
-	debug_config.h
+    debug_config.h
 \end{verbatim}
 
-Inside this file you will find a configuration flag for enabling debug output.
-
-Enable debugging by setting the flag to:
+Enable debugging by setting:
 
 \begin{verbatim}
-	#define DEBUG_ENABLED 1
+    #define DEBUG_ENABLED 1
 \end{verbatim}
 
-If debugging is disabled, the value will typically be:
+Disable debugging by setting:
 
 \begin{verbatim}
-	#define DEBUG_ENABLED 0
+    #define DEBUG_ENABLED 0
 \end{verbatim}
 
-After changing this value, upload the firmware again to the ESP32.
+When \verb|DEBUG_ENABLED| is enabled, the repository also enables the individual debug categories:
+
+\begin{verbatim}
+    #define DBG_STICKS   1
+    #define DBG_KNOBS    1
+    #define DBG_SWITCHES 1
+    #define DBG_EVENTS   1
+\end{verbatim}
+
+After changing any debug setting, compile and upload the firmware again to the ESP32.
 
 \subsection{Open the Serial Monitor}
 
@@ -184,7 +201,7 @@ Example output:
 \begin{verbatim}
 	L Stick X: 512    L Stick Y: 510
 	L Stick X: 650    L Stick Y: 480
-	
+
 	R Stick X: 300    R Stick Y: 700
 \end{verbatim}
 
@@ -216,7 +233,7 @@ Example output:
 	Left Knob: 340
 	Left Knob: 512
 	Left Knob: 890
-	
+
 	Right Knob: 120
 	Right Knob: 780
 \end{verbatim}
@@ -282,7 +299,7 @@ Example output:
 	Event ID: 0x03
 	Checksum: 0x7A
 	--------------
-	
+
 \end{verbatim}
 
 Events are triggered when the user presses a button in the Android application.
@@ -326,7 +343,7 @@ Inside this file you can select the telemetry debug mode.
 	#define DBG_PANEL       1
 	#define DBG_INDICATOR   2
 	#define DBG_PLOT        3
-	
+
 	#define TELEMETRY_DEBUG_MODE DBG_INDICATOR
 \end{verbatim}
 
@@ -642,7 +659,7 @@ Example modification:
 	const char* panelNames[] = { "Motor RPM", "Battery Voltage" };
 \end{verbatim}
 
-Note: It's recommended to use a maximum of 12 characters. 
+Note: It's recommended to use a maximum of 12 characters.
 
 \subsection{Indicator Labels}
 

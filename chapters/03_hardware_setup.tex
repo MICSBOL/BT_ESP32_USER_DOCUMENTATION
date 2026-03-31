@@ -1,46 +1,123 @@
 \chapter{Hardware Setup}
+\label{ch:hardware-setup}
 
-\section{ESP32 Board}
+This chapter describes the recommended hardware setup for the
+\textbf{MICSBOL/ESP32\_BT\_Controller} firmware: the ESP32 receives control packets from the Android app over
+Bluetooth (SPP), drives actuators through the hardware abstraction layer (HAL), and can optionally read
+sensor inputs for telemetry.
 
-The ESP32 acts as the main controller for the system. It receives commands from the Android application via Bluetooth and controls the connected hardware.
+\section{ESP32 Development Board}
+\label{sec:hw-esp32-board}
 
-Typical ESP32 development boards include:
+The ESP32 acts as the main controller. After flashing the firmware and powering the board, it advertises a
+Bluetooth device named \texttt{ESP32-BT}. If Android prompts for a PIN during pairing, the default PIN is
+\texttt{1234}. (Bluetooth profile: SPP.)\footnote{See the repository's \texttt{README.md} connection guide for the
+    exact device name, default PIN, and quick reference.}
 
+A typical setup includes:
 \begin{itemize}
-	\item ESP32 DevKit
-	\item ESP32-WROOM boards
-	\item ESP32 NodeMCU boards
+    \item an ESP32 development board flashed with the repository firmware,
+    \item a stable 5V supply (USB power bank / charger or regulated 5V source),
+    \item connected actuators (motor driver, servos, LEDs/buzzer), and
+    \item optional sensors (analog or I\textsuperscript{2}C) for telemetry.
 \end{itemize}
+
+\paragraph{Project modes}
+The firmware supports different wiring approaches depending on the selected mode in \texttt{user\_config.h}:
+\begin{itemize}
+    \item \texttt{MODE\_FULL\_RC} (default): uses ESP32 built-in pins for outputs.
+    \item \texttt{MODE\_FULL\_RC\_MCP}: expands digital outputs using an MCP23017 GPIO expander.
+\end{itemize}
+
+\section{Control Outputs (What the App Controls)}
+\label{sec:hw-control-outputs}
+
+Once connected, the Android app provides control channels that are mapped in the firmware's control/HAL layer:
+\begin{itemize}
+    \item Left stick X: steering (left/right)
+    \item Left stick Y: left motor speed
+    \item Right stick X: camera pan (left/right)
+    \item Right stick Y: right motor speed
+    \item Left knob: LED brightness (0 = off, max = full)
+    \item Right knob: buzzer intensity (0 = silent, max = full)
+    \item Switches 1--6: digital outputs (on/off)
+    \item Event buttons: send a short pulse to a switch output
+\end{itemize}
+
+These mappings are summarized in the repository \texttt{README.md} and implemented by the firmware in
+\texttt{control.cpp} and \texttt{hal\_output.cpp}.
 
 \section{Motor Driver Connection}
+\label{sec:hw-motor-driver}
 
-Motors cannot be powered directly from the ESP32 pins. A motor driver is required.
+DC motors must \textbf{not} be powered directly from ESP32 pins. A motor driver is required (for example,
+a dual H-bridge module).
 
-The motor driver receives control signals from the ESP32 and supplies power to the motors.
-
-Typical connections include:
-
+The driver typically needs:
 \begin{itemize}
-	\item Motor direction pins
-	\item PWM speed control pins
-	\item Power input
-	\item Motor outputs
+    \item \textbf{Motor supply (VM)}: battery voltage suitable for the motors,
+    \item \textbf{Logic supply (VCC)}: usually 3.3V or 5V depending on the driver module,
+    \item \textbf{GND}: common ground shared with the ESP32, and
+    \item \textbf{Control inputs}: PWM and direction inputs driven by ESP32 GPIOs (through the HAL).
 \end{itemize}
+
+\paragraph{Common ground is mandatory}
+If the motor driver and the ESP32 do not share a common ground, PWM and direction signals will be unreliable
+and motors may not respond.
 
 \section{Servo Connections}
+\label{sec:hw-servos}
 
-Servo motors can be connected directly to the ESP32 PWM pins.
+Servo motors can be controlled from ESP32 PWM-capable GPIO pins. The firmware treats some channels as PWM
+outputs that may be mapped to steering and camera pan.
 
-Servos can be used for:
-
+\paragraph{Servo power}
+Even though the PWM signal comes from the ESP32, most servos should be powered from a separate 5V rail:
 \begin{itemize}
-	\item Steering
-	\item Camera pan control
-	\item Robotic arms
+    \item Servo \textbf{V+}: external 5V regulator (sized for the servo stall current)
+    \item Servo \textbf{GND}: shared with ESP32 GND
+    \item Servo \textbf{Signal}: ESP32 PWM pin
 \end{itemize}
 
-\section{Power Supply}
+\section{Optional Inputs and Telemetry Sensors}
+\label{sec:hw-telemetry-inputs}
 
-Motors and the ESP32 should be powered from an appropriate battery or power supply.
+The firmware can send telemetry back to the Android app (numeric panels, indicators, and plots). The repository
+describes telemetry elements such as panels, indicators (throttle/battery), and plots (volts/amps/RPM). Telemetry
+values can come from real sensors (analog/I\textsuperscript{2}C) or can be injected for testing using the telemetry
+debug modes in \texttt{debug\_config.h}.
 
-Always ensure that all devices share a common ground connection.
+Typical sensor interfaces:
+\begin{itemize}
+    \item \textbf{Analog inputs (ADC)}: for battery monitors, potentiometers, temperature sensors, etc.
+    \item \textbf{I\textsuperscript{2}C}: for external sensors or I/O expansion (MCP23017 in MCP mode)
+\end{itemize}
+
+\section{Power Supply and Safety}
+\label{sec:hw-power}
+
+A reliable power system is essential for stable Bluetooth operation and correct motor/servo control.
+
+\subsection{Recommended power arrangement}
+\begin{itemize}
+    \item \textbf{ESP32:} powered from 5V USB or a regulated 5V rail.
+    \item \textbf{Motors:} powered from a motor battery rail through a motor driver (VM).
+    \item \textbf{Servos (if used):} powered from a separate 5V regulator capable of high peak current.
+\end{itemize}
+
+\subsection{Grounding}
+Always connect the grounds together:
+\begin{itemize}
+    \item ESP32 GND
+    \item motor driver GND
+    \item servo power GND
+    \item sensor GND
+\end{itemize}
+
+\subsection{Practical notes}
+\begin{itemize}
+    \item Keep motor power wiring physically separated from ESP32 signal wiring when possible.
+    \item Add decoupling capacitors near motor drivers/servo rails to reduce brownouts.
+    \item If the ESP32 resets when motors start, the cause is usually power sag or noise: improve the regulator,
+    add capacitance, and verify the ground wiring topology.
+\end{itemize}

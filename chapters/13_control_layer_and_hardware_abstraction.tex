@@ -36,25 +36,58 @@ The firmware uses a layered flow from the Android app to physical hardware:
     \item \textbf{HAL} (\texttt{hal\_output.cpp}) performs the actual GPIO/PWM/I\textsuperscript{2}C operations.
 \end{enumerate}
 
+
 \begin{figure}[H]
     \centering
     \begin{tikzpicture}[
-        block/.style={rectangle, draw, thick, minimum width=11.8cm, minimum height=1.05cm, align=center},
-        arrow/.style={->, thick},
-        node distance=0.9cm
+        font=\small,
+        >=Stealth,
+        line/.style={->, very thick, draw=black!70},
+        box/.style={
+            draw,
+            rounded corners=2mm,
+            very thick,
+            align=center,
+            minimum width=12.6cm,
+            minimum height=1.15cm,
+            fill=gray!4
+        },
+        boxApp/.style={box, fill=blue!6,  draw=blue!55!black},
+        boxCore/.style={box, fill=teal!6, draw=teal!55!black},
+        boxHw/.style={box, fill=green!6, draw=green!55!black},
+        tag/.style={
+            draw=black!25,
+            fill=white,
+            rounded corners=1mm,
+            inner sep=2pt,
+            font=\scriptsize\bfseries,
+            text=black!70
+        }
         ]
-        \node[block] (android) {Android App (UI Controls)};
-        \node[block, below=of android] (bt) {Bluetooth Serial (SPP)};
-        \node[block, below=of bt] (rx) {\texttt{receiver.cpp} (decode into \texttt{rcStatePacket} / \texttt{rcEventPacket})};
-        \node[block, below=of rx] (control) {\texttt{control.cpp} (control policy: mapping inputs to actions)};
-        \node[block, below=of control] (hal) {\texttt{hal\_output.cpp} (hardware mechanisms: PWM/GPIO/MCP)};
-        \node[block, below=of hal] (hw) {Hardware (motors, servos, LEDs, switches, MCP23017)};
 
-        \draw[arrow] (android) -- (bt);
-        \draw[arrow] (bt) -- (rx);
-        \draw[arrow] (rx) -- (control);
-        \draw[arrow] (control) -- (hal);
-        \draw[arrow] (hal) -- (hw);
+        % Manual coordinates (no "below=of" required)
+        \node[boxApp]  (android) at (0, 0.0)  {Android App\\\footnotesize UI Controls (sticks, knobs, switches, buttons)};
+        \node[boxCore] (bt)      at (0,-1.7)  {Bluetooth Serial (SPP)};
+        \node[boxCore] (rx)      at (0,-3.4)  {receiver.cpp\\\footnotesize Rolling buffer + decode into rcStatePacket / rcEventPacket};
+        \node[boxCore] (control) at (0,-5.1)  {control.cpp\\\footnotesize Control policy (map inputs to actions)};
+        \node[boxCore] (hal)     at (0,-6.8)  {hal\_output.cpp\\\footnotesize Hardware outputs (PWM / GPIO / MCP)};
+        \node[boxHw]   (hw)      at (0,-8.5)  {Hardware\\\footnotesize Motors, servos, LEDs, switches, MCP23017};
+
+        % arrows
+        \draw[line] (android) -- (bt);
+        \draw[line] (bt) -- (rx);
+        \draw[line] (rx) -- (control);
+        \draw[line] (control) -- (hal);
+        \draw[line] (hal) -- (hw);
+
+        % left-side step tags
+        \node[tag] at (-7.1, 0.0)  {1};
+        \node[tag] at (-7.1,-1.7)  {2};
+        \node[tag] at (-7.1,-3.4)  {3};
+        \node[tag] at (-7.1,-5.1)  {4};
+        \node[tag] at (-7.1,-6.8)  {5};
+        \node[tag] at (-7.1,-8.5)  {6};
+
     \end{tikzpicture}
     \caption{Control data flow from Android to ESP32 hardware.}
 \end{figure}

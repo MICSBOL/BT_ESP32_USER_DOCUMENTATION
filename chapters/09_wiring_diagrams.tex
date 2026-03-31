@@ -8,24 +8,66 @@ These diagrams are simplified so beginners can quickly understand how to connect
 
 The most common project is a simple differential drive robot using two motors.
 
+% Requires: \usetikzlibrary{positioning,arrows.meta,calc}
+% (You already load positioning+arrows.meta in main.tex.)
+% Narrower (less wide) + optionally taller layout.
+% Uses a mostly-vertical flow: Phone -> ESP32 -> Driver, with motors branching right.
+% Requires: \usetikzlibrary{positioning,arrows.meta,calc}
+
 \begin{center}
-	\begin{tikzpicture}[
-		block/.style={draw, rectangle, minimum width=3cm, minimum height=1cm},
-		line/.style={->, thick}
-		]
+    \begin{tikzpicture}[
+        font=\small,
+        >=Stealth,
+        node distance=22mm and 34mm, % tighter spacing (vertical and horizontal)
+        box/.style={
+            draw,
+            rounded corners=2mm,
+            very thick,
+            align=center,
+            minimum width=36mm,  % reduced width
+            minimum height=14mm, % slightly taller
+            fill=gray!6
+        },
+        boxAccent/.style={
+            box,
+            fill=blue!6,
+            draw=blue!60!black
+        },
+        boxHW/.style={
+            box,
+            fill=green!6,
+            draw=green!50!black
+        },
+        arrow/.style={->, very thick, draw=black!70},
+        label/.style={midway, fill=white, inner sep=1.5pt, text=black!80, font=\scriptsize}
+        ]
 
-		\node[block] (phone) {Android App};
-		\node[block, right=3cm of phone] (esp32) {ESP32};
-		\node[block, right=3cm of esp32] (driver) {Motor Driver};
-		\node[block, above right=1cm and 1.5cm of driver] (motor1) {Left Motor};
-		\node[block, below right=1cm and 1.5cm of driver] (motor2) {Right Motor};
+        % Nodes (stacked vertically to reduce width)
+        \node[boxAccent] (phone) {Android\\App};
+        \node[boxAccent, below=of phone] (esp32) {ESP32\\Controller};
+        \node[boxHW, below=of esp32] (driver) {Motor\\Driver};
 
-		\draw[line] (phone) -- node[above]{Bluetooth} (esp32);
-		\draw[line] (esp32) -- node[above]{Control Signals} (driver);
-		\draw[line] (driver) -- (motor1);
-		\draw[line] (driver) -- (motor2);
+        % Motors branch to the right (compact)
+        \node[boxHW, right=16mm of driver, yshift=+9mm] (motorL) {Left\\Motor};
+        \node[boxHW, right=16mm of driver, yshift=-9mm] (motorR) {Right\\Motor};
 
-	\end{tikzpicture}
+        % Arrows + labels
+        \draw[arrow] (phone) -- node[label, right]{Bluetooth SPP} (esp32);
+        \draw[arrow] (esp32) -- node[label, right, yshift=-3mm]{PWM + DIR} (driver);
+
+        \draw[arrow] (driver.east) -- node[label, above, sloped]{Power} (motorL.west);
+        \draw[arrow] (driver.east) -- node[label, below, sloped]{Power} (motorR.west);
+
+        % Optional subtle grouping
+        \draw[dashed, rounded corners=2mm, draw=black!30]
+        ($(phone.north west)+(-4mm,4mm)$) rectangle ($(esp32.south east)+(4mm,-4mm)$);
+        \node[font=\normalsize, text=black!60] at ($(phone.west)!0.5!(esp32.north)-(2.5,6mm)$) {Control Link};
+
+        \draw[dashed, rounded corners=2mm, draw=black!30]
+        ($(driver.north west)+(-4mm,12mm)$) rectangle ($(motorR.south east)+(4mm,-4mm)$);
+        \node[font=\normalsize, text=black!60] at ($(driver.north)!0.55!(motorL.north)+(11mm,10mm)$) {Power Stage};
+
+    \end{tikzpicture}
 \end{center}
 
 \section{Servo Control Example}
