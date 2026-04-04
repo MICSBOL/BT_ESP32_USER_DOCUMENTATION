@@ -1,0 +1,98 @@
+\chapter{Controles Básicos}
+\label{ch:basic-controls}
+
+Este capítulo describe los principales controles del operador disponibles en la \textit{Pantalla RC}. La interfaz está organizada en el lado izquierdo y el lado derecho del controlador, además de un área central de telemetría, lo que permite conducir el robot mientras se monitorea el estado del sistema en tiempo real.
+
+\section{Distribución de la Pantalla RC}
+\label{sec:rc-layout}
+
+La Pantalla RC se compone de tres regiones principales:
+
+\begin{itemize}
+    \item \textbf{Lado Izquierdo del Controlador:} controles primarios (dependen del modo del joystick), interruptores, perilla y un widget de estado en la parte superior.
+    \item \textbf{Pantalla Central:} una gráfica de telemetría utilizada para visualizar datos en vivo.
+    \item \textbf{Lado Derecho del Controlador:} controles secundarios (dependen del modo del joystick), interruptores, perilla y un widget de estado en la parte superior.
+\end{itemize}
+
+Un panel de fondo proporciona contraste para mejorar la legibilidad, y la pantalla está pensada para usarse en \textbf{orientación horizontal} (landscape) para un espaciado más ergonómico.
+
+\section{Control con Joystick}
+\label{sec:joystick-control}
+
+Cada lado del controlador incluye un joystick virtual. El comportamiento del joystick depende del \textbf{modo de stick} seleccionado (configurado en los ajustes del usuario):
+
+\begin{itemize}
+    \item \textbf{Modo resorte (Spring):} el joystick vuelve al centro al soltarlo (útil para entradas momentáneas como dirección o ajuste fino de velocidad).
+    \item \textbf{Modo fijo (Hold):} el joystick mantiene su posición al soltarlo (útil para aceleración sostenida o consignas).
+    \item \textbf{Modos direccionales:} algunas configuraciones pueden enfatizar el control horizontal vs.\ vertical según los requisitos del robot.
+\end{itemize}
+
+Usos típicos del joystick:
+
+\begin{itemize}
+    \item Movimiento hacia adelante/atrás (aceleración)
+    \item Giro izquierda/derecha (dirección)
+    \item Paneo/inclinación de cámara (cuando se asigna a un gimbal)
+    \item Cualquier canal de control continuo requerido por el robot (por ejemplo, control de consignas)
+\end{itemize}
+
+\section{Interruptores (Canales Discretos)}
+\label{sec:switches}
+
+Tanto el lado izquierdo como el lado derecho proporcionan \textbf{interruptores tipo toggle} para canales de control discretos. Los interruptores están pensados para acciones que son \textit{encendido/apagado} o que seleccionan entre un número pequeño de estados, por ejemplo:
+
+\begin{itemize}
+    \item Habilitar/deshabilitar motores
+    \item Seleccionar modos de conducción (p.\ ej., lento/normal/boost)
+    \item Encender/apagar dispositivos auxiliares (luces, bomba, ventilador, etc.)
+\end{itemize}
+
+\section{Perillas (Canales Analógicos)}
+\label{sec:knobs}
+
+Cada lado también incluye una \textbf{perilla giratoria} para ajuste analógico. Las perillas son útiles para afinar parámetros mientras se conduce:
+
+\begin{itemize}
+    \item Sensibilidad o ajuste fino (trim) de la dirección
+    \item Límite de velocidad
+    \item Zoom o enfoque de cámara (si es compatible)
+    \item Ganancias PID u otros parámetros de ajuste (configuraciones avanzadas)
+\end{itemize}
+
+\section{Botones Centrales}
+\label{sec:center-buttons}
+
+La Pantalla RC incluye \textbf{botones pulsadores} cerca del área central (arriba y abajo por lado). Están pensados para acciones rápidas que deben ejecutarse inmediatamente, por ejemplo:
+
+\begin{itemize}
+    \item Bocina / zumbador
+    \item Reset / confirmación (acknowledge)
+    \item Tomar foto / iniciar grabación (carga útil de cámara)
+    \item Disparar una rutina automatizada
+\end{itemize}
+
+\section{Indicadores y Telemetría}
+\label{sec:telemetry}
+
+La interfaz proporciona varias formas de retroalimentación para que el operador pueda monitorear el sistema mientras lo controla:
+
+\begin{itemize}
+    \item \textbf{Indicador analógico (widget superior izquierdo):} muestra un valor numérico con un título (p.\ ej., RPM, temperatura, intensidad de señal).
+    \item \textbf{Estado de batería (widget superior derecho):} muestra el nivel de batería con una etiqueta de título.
+    \item \textbf{Indicadores LED:} un conjunto de LEDs para señales rápidas de estado (p.\ ej., estado armado, advertencias, estado de enlace).
+    \item \textbf{Indicadores de panel:} paneles por lado que muestran un valor, un estado encendido/apagado, un color y un título (útiles para canales de telemetría con nombre).
+    \item \textbf{Gráfica central:} una gráfica en vivo que muestra una o varias series de telemetría a lo largo del tiempo.
+\end{itemize}
+
+Estos indicadores ayudan a confirmar la recepción de comandos y permiten detectar problemas como batería baja, pérdida de enlace o advertencias de sensores de forma temprana.
+
+\section{Resumen}
+\label{sec:basic-controls-summary}
+
+En general:
+\begin{itemize}
+    \item Usa los \textbf{joysticks} para el control continuo de movimiento.
+    \item Usa \textbf{interruptores y botones} para acciones discretas y cambios de modo.
+    \item Usa las \textbf{perillas} para ajustes de precisión.
+    \item Usa \textbf{widgets de telemetría y gráficas} para monitorear el estado del sistema durante la operación.
+\end{itemize}

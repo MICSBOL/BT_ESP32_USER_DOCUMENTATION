@@ -1,0 +1,383 @@
+\chapter{Ejemplos Prácticos de Control y Telemetría}
+\label{ch:practical-examples}
+
+\section{Introducción}
+\label{sec:practical-intro}
+
+Este capítulo proporciona ejemplos prácticos que demuestran cómo interactúan la aplicación Android
+y el firmware \textbf{MICSBOL/ESP32\_BT\_Controller} en un robot real o un sistema embebido.
+
+Del lado Android se transmite continuamente un \textbf{estado de control} (sticks, perillas e interruptores),
+y también se transmiten \textbf{eventos de una sola vez} cuando el usuario presiona botones.
+
+Del lado del ESP32:
+\begin{itemize}
+    \item decodifica los paquetes entrantes por Bluetooth Serial (SPP),
+    \item aplica los valores de control recibidos a salidas de hardware reales (PWM, pines de dirección, interruptores),
+    \item y opcionalmente envía telemetría de vuelta a la app Android (paneles, indicadores, gráficas).
+\end{itemize}
+
+\section{Datos de Control desde la Aplicación Android}
+\label{sec:control-data}
+
+\subsection{Paquete de estado RC (\texttt{rcStatePacket})}
+El firmware almacena el estado de control más reciente en la estructura definida en \texttt{packets.h}:
+
+\begin{verbatim}
+    rcStatePacket
+\end{verbatim}
+
+Contiene los siguientes campos:
+
+\begin{itemize}
+    \item \texttt{leftStickX}, \texttt{leftStickY}
+    \item \texttt{rightStickX}, \texttt{rightStickY}
+    \item \texttt{leftKnob}, \texttt{rightKnob}
+    \item \texttt{switches} (máscara de bits)
+\end{itemize}
+
+En el código del repositorio, los canales de sticks y perillas se tratan como valores de 12 bits y se mapean en el
+rango \textbf{0..4095} (ver \texttt{control.cpp}, \texttt{hal\_output.cpp}).
+
+\subsection{Paquete de evento (\texttt{rcEventPacket})}
+Los botones se transmiten como pequeños paquetes de evento, y el ID del evento se pasa a:
+
+\begin{verbatim}
+    controlHandleEvent(byte eventId)
+\end{verbatim}
+
+Los eventos son útiles para acciones que deben ser \emph{momentáneas} (p.\ ej., disparar, reset, bocina) en lugar de un
+valor analógico continuo.
+
+\section{Cómo el ESP32 Recibe Paquetes}
+\label{sec:receiver}
+
+Los bytes Bluetooth entrantes se procesan en:
+
+\begin{verbatim}
+    receiver.cpp  ->  handleBluetooth()
+\end{verbatim}
+
+El receptor mantiene un buffer circular y busca encabezados de paquetes.
+En la implementación actual del firmware:
+
+\begin{itemize}
+    \item Encabezado RC State: \texttt{0xAA 0x55}
+    \item Encabezado Event: \texttt{0xBB 0x66}
+\end{itemize}
+
+Una vez decodificado un evento, \texttt{controlHandleEvent()} se llama inmediatamente.
+
+\section{Dónde se Aplican los Valores de Control}
+\label{sec:control-layer}
+
+El bucle principal de control se implementa en:
+
+\begin{verbatim}
+    control.cpp  ->  controlUpdate()
+\end{verbatim}
+
+Esta función lee valores de \texttt{rcStatePacket} y los envía a la capa de abstracción de hardware
+(\texttt{hal\_output.cpp}):
+
+\begin{itemize}
+    \item PWM del servo de dirección
+    \item comandos de motor izquierdo/derecho
+    \item PWM de paneo de cámara
+    \item brillo de LED e intensidad de zumbador (PWM)
+    \item salidas de interruptores (máscara de bits decodificada en salidas por canal)
+\end{itemize}
+
+\section{Ejemplo 1: Control de Dirección Usando el Joystick Izquierdo}
+\label{sec:example-steering}
+
+El firmware mapea el eje horizontal del joystick izquierdo a un valor PWM tipo servo:
+
+\begin{verbatim}
+    rcStatePacket.data.leftStickX
+\end{verbatim}
+
+En \texttt{control.cpp}, la dirección se genera con:
+
+\begin{verbatim}
+    static uint32_t mapServo(uint16_t v) {
+        return map(v, 0, 4095, 205, 410);
+    }
+
+    uint32_t steerPWM = mapServo(rcStatePacket.data.leftStickX);
+    halSetSteering(steerPWM);
+\end{verbatim}
+
+\subsection*{Interpretación práctica}
+\begin{itemize}
+    \item El joystick Android produce un valor de 0 a 4095.
+    \item El ESP32 lo mapea a un rango PWM más pequeño (205..410) adecuado para su configuración PWM.
+\end{itemize}
+
+\noindent Esto se usa comúnmente para:
+\begin{itemize}
+    \item dirección de auto RC
+    \item dirección de ruedas delanteras de robot
+    \item un timón accionado por servo
+\end{itemize}
+
+\section{Ejemplo 2: Control de Velocidad de Motores en Tracción Diferencial}
+\label{sec:example-motors}
+
+El firmware usa los ejes verticales de los joysticks como canales de motor izquierdo/derecho:
+
+\begin{verbatim}
+    rcStatePacket.data.leftStickY
+    rcStatePacket.data.rightStickY
+\end{verbatim}
+
+En \texttt{control.cpp}:
+
+\begin{verbatim}
+    uint32_t motorL = rcStatePacket.data.leftStickY;
+    uint32_t motorR = rcStatePacket.data.rightStickY;
+
+    halSetMotorLeft(motorL);
+    halSetMotorRight(motorR);
+\end{verbatim}
+
+\subsection{Mapeo de dirección + velocidad (comportamiento implementado)}
+En \texttt{hal\_output.cpp}, cada valor de motor se interpreta con una banda muerta (dead-band):
+
+\begin{itemize}
+    \item \textbf{0..2000:} pin de dirección LOW (reversa) y PWM mapeado a 0..4095
+    \item \textbf{2001..2094:} banda muerta, objetivo del motor se establece en 0
+    \item \textbf{2095..4095:} pin de dirección HIGH (adelante) y PWM mapeado a 0..4095
+\end{itemize}
+
+Este diseño reduce el jitter cuando el joystick está cerca del centro.
+
+\subsection{Rampa suave (comportamiento avanzado)}
+En lugar de escribir PWM instantáneamente, el PWM del motor hace una rampa hacia un valor objetivo. Una interrupción por timer actualiza
+las salidas de motor cada 20 ms, moviendo la velocidad por un paso fijo (ver \texttt{updateMotors()} en
+\texttt{hal\_output.cpp}). Esto mejora la manejabilidad y reduce picos de corriente.
+
+\section{Ejemplo 3: Control de Paneo de Cámara}
+\label{sec:example-camera}
+
+El eje horizontal del joystick derecho se usa para paneo de cámara:
+
+\begin{verbatim}
+    uint32_t panPWM = mapServo(rcStatePacket.data.rightStickX);
+    halSetCameraPan(panPWM);
+\end{verbatim}
+
+\noindent Usos típicos en la vida real:
+\begin{itemize}
+    \item cámara de rover de inspección
+    \item posicionamiento de cámara FPV
+    \item montaje de sensor tipo torreta
+\end{itemize}
+
+\section{Ejemplo 4: Usar Perillas para Controlar PWM de LED y Zumbador}
+\label{sec:example-knobs}
+
+La app Android proporciona dos perillas, transmitidas como valores 0..4095:
+
+\begin{verbatim}
+    rcStatePacket.data.leftKnob
+    rcStatePacket.data.rightKnob
+\end{verbatim}
+
+En \texttt{control.cpp}, estas se mapean directamente a salidas PWM mediante el HAL:
+
+\begin{verbatim}
+    halSetLed(rcStatePacket.data.leftKnob);
+    halSetBuzzer(rcStatePacket.data.rightKnob);
+\end{verbatim}
+
+\subsection*{Usos prácticos}
+\begin{itemize}
+    \item brillo de LED (faros, underglow, luz de trabajo)
+    \item volumen / intensidad del zumbador (alertas, pitidos de confirmación)
+    \item reutilizar perillas para escalado de límite de motor o trim de servo (modificación personalizada del firmware)
+\end{itemize}
+
+\section{Ejemplo 5: Controlar Salidas Digitales con Interruptores}
+\label{sec:example-switches}
+
+Los interruptores se transmiten como una máscara de bits en un solo byte:
+
+\begin{verbatim}
+    byte sw = rcStatePacket.data.switches;
+\end{verbatim}
+
+En \texttt{control.cpp}, el firmware itera a través de los índices de switch:
+
+\begin{verbatim}
+    for (int i = 0; i < 6; i++) {
+        halSetSwitch(i, (sw >> i) & 1);
+    }
+\end{verbatim}
+
+\subsection*{Diferencia importante por modo}
+La cantidad de switches soportados depende del modo de proyecto (ver \texttt{hal\_output.cpp}):
+
+\begin{itemize}
+    \item \textbf{FULL\_RC\_MODE:} solo los índices 0..3 se escriben a pines GPIO (4 salidas de switch).
+    \item \textbf{FULL\_RC\_MODE\_MCP:} los índices 0..5 se escriben usando salidas del MCP23017 (6 salidas de switch).
+\end{itemize}
+
+\noindent Usos en el mundo real:
+\begin{itemize}
+    \item switch de habilitar/armar (seguridad)
+    \item faros / baliza / underglow
+    \item salidas de relé (bomba, solenoide, alimentación de accesorio)
+    \item selección de modo (manual vs asistido)
+\end{itemize}
+
+\section{Ejemplo 6: Manejo de Eventos de Botón (Salidas de Pulso)}
+\label{sec:example-events}
+
+Los eventos se manejan mediante:
+
+\begin{verbatim}
+    controlHandleEvent(byte eventId)
+\end{verbatim}
+
+En la implementación del repositorio, los eventos llaman a \texttt{halPulseSwitch(index)}. El mapeo de índices difiere
+según el modo de proyecto. Por ejemplo, en \texttt{FULL\_RC\_MODE}:
+
+\begin{verbatim}
+    case 0x01: halPulseSwitch(0); break;
+    case 0x02: halPulseSwitch(1); break;
+    case 0x03: halPulseSwitch(0); break;
+    case 0x04: halPulseSwitch(1); break;
+\end{verbatim}
+
+\subsection{Pulsos no bloqueantes}
+\texttt{halPulseSwitch()} usa \texttt{pulseStart()} que genera un \textbf{pulso no bloqueante}
+(por defecto 50 ms) y requiere que \texttt{pulseUpdate()} se llame en el lazo principal.
+
+\noindent Acciones típicas de evento:
+\begin{itemize}
+    \item bocina / efecto de sonido corto
+    \item disparador ``tomar foto'' para una cámara
+    \item resetear un subsistema (re-zero de IMU, línea de reset de controlador)
+    \item relé momentáneo (pestillo de puerta, golpe de actuador)
+\end{itemize}
+
+\section{Datos de Telemetría Enviados a la Aplicación Android}
+\label{sec:telemetry-data}
+
+La telemetría es generada por:
+
+\begin{verbatim}
+    telemetry.cpp
+    telemetry_source.cpp
+\end{verbatim}
+
+El diseño está intencionalmente dividido:
+\begin{itemize}
+    \item \textbf{\texttt{telemetry.cpp}} construye y envía paquetes (solo escritura).
+    \item \textbf{\texttt{telemetry\_source.cpp}} provee valores (lecturas de hardware o valores inyectados por debug).
+\end{itemize}
+
+\subsection{Tipos de telemetría y tasas (implementado)}
+\begin{itemize}
+    \item \textbf{Indicadores:} cada 500 ms (\(\approx 2\,Hz\)).
+    \item \textbf{Gráficas (plots):} cada 50 ms (\(\approx 20\,Hz\)).
+    \item \textbf{Paneles:} retransmitidos brevemente cuando los valores cambian (ventana de reenvío para robustez).
+\end{itemize}
+
+\subsection{Config-on-connect}
+En una nueva conexión, el ESP32 envía un \textbf{paquete de configuración} que incluye nombres de gráficas/paneles/indicadores
+(p.\ ej., \texttt{Volts}, \texttt{Amps}, \texttt{RPMs}, \texttt{Left}, \texttt{Right}, \texttt{Throttle}, \texttt{Battery}).
+Esto permite que la app Android etiquete elementos de UI automáticamente.
+
+\section{Ejemplo 7: Telemetría de Batería como Indicador}
+\label{sec:example-battery}
+
+El paquete de indicadores del firmware incluye:
+\begin{itemize}
+    \item \texttt{analogValue} (0--100)
+    \item \texttt{batteryLevel} (0--100)
+    \item \texttt{digitalMask} (bitfield)
+\end{itemize}
+
+En modo normal, la batería se lee desde un pin ADC y se mapea a un porcentaje (ver \texttt{hwReadIndicatorBattery()}
+en \texttt{input\_hw.cpp}):
+
+\begin{verbatim}
+    return map(analogRead(PIN_ANALOG_IND2), 0, 4095, 0, 100);
+\end{verbatim}
+
+\noindent Nota práctica de cableado: el voltaje de batería debe escalarse con un divisor de voltaje para que el ADC del ESP32
+nunca supere 3.3V.
+
+\section{Ejemplo 8: Paneles de Telemetría desde Entradas Analógicas}
+\label{sec:example-panels}
+
+La telemetría de panel usa dos valores de 16 bits (\texttt{leftPanelValue}, \texttt{rightPanelValue}). La implementación de hardware
+por defecto lee valores analógicos y los escala de 0..4095 a 0..65535:
+
+\begin{verbatim}
+    uint16_t hwReadNumeric1() {
+        uint32_t v = analogRead(PIN_NUMERIC1);
+        return (uint16_t)((v * 65535UL) / 4095);
+    }
+\end{verbatim}
+
+Esto es adecuado para:
+\begin{itemize}
+    \item sensores de distancia con salida analógica
+    \item realimentación con potenciómetro
+    \item señales de sensor escaladas (después de acondicionamiento)
+\end{itemize}
+
+\section{Ejemplo 9: Señales de Gráfica (0..255 Gráficas Rápidas)}
+\label{sec:example-plots}
+
+Las gráficas transmiten tres valores de 8 bits (0..255) a \(\approx 20\,Hz\). La implementación de hardware por defecto lee
+valores ADC y los mapea a 0..255:
+
+\begin{verbatim}
+    uint8_t hwReadPlot1() {
+         return map(analogRead(PIN_NUMERIC1), 0, 4095, 0, 255);
+         }
+    uint8_t hwReadPlot2() { \\
+        return map(analogRead(PIN_NUMERIC2), 0, 4095, 0, 255);
+        }
+    uint8_t hwReadPlot3() {
+        return map(analogRead(PIN_ANALOG_IND2), 0, 4095, 0, 255);
+        }
+\end{verbatim}
+
+\noindent Ideas prácticas para gráficas:
+\begin{itemize}
+    \item tendencia de voltaje de batería (caída bajo aceleración)
+    \item tendencia de sensor de corriente (detectar atascos)
+    \item tendencia de velocidad derivada de RPM/encoder
+\end{itemize}
+
+\section{Ejemplo 10: Indicadores de Máscara Digital}
+\label{sec:example-digital-mask}
+
+La telemetría de indicadores incluye un byte de máscara digital que puede representar hasta 8 señales on/off.
+En \texttt{input\_hw.cpp}, se construye una máscara a partir de lecturas GPIO de indicadores (o desde entradas del MCP23017 en modo MCP).
+
+Esto es útil para mostrar de forma compacta:
+\begin{itemize}
+    \item finales de carrera
+    \item banderas de falla
+    \item sensores de parachoques
+    \item señales de ``armado'' / ``listo''
+\end{itemize}
+
+\section{Resumen}
+\label{sec:practical-summary}
+
+El sistema soporta comunicación bidireccional:
+
+\begin{itemize}
+    \item \textbf{Android \(\rightarrow\) ESP32:} estado RC continuo + eventos discretos.
+    \item \textbf{ESP32 \(\rightarrow\) Android:} paneles, indicadores y gráficas con configuración automática de etiquetas.
+\end{itemize}
+
+Al combinar entradas de control (sticks, perillas, switches, eventos) con retroalimentación de telemetría en vivo, puedes construir
+robots y sistemas embebidos que sean \textbf{fáciles de operar} y \textbf{fáciles de depurar en tiempo real}.

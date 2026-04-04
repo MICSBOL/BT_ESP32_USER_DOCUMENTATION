@@ -1,0 +1,690 @@
+\chapter{Conexión de la Aplicación Android}
+
+% Texto de sección mejorado basado en el comportamiento del repositorio MICSBOL/ESP32_BT_Controller.
+% Notas:
+% - Se usa \verb|...| para nombres de archivos/macros y así evitar problemas con guiones bajos en babel+hyperref.
+% - Las banderas de depuración reflejan la configuración en debug_config.h del repositorio.
+
+\section{Instalar la Aplicación}
+Instala la aplicación Android de RC Controller en tu teléfono usando el método de distribución proporcionado
+por tu proyecto (APK, enlace de tienda o despliegue interno).
+
+\section{Activar Bluetooth}
+Activa Bluetooth en tu teléfono antes de abrir la aplicación. En versiones recientes de Android, la app puede solicitar
+permisos adicionales (por ejemplo, ``Dispositivos cercanos'' o permisos relacionados con Ubicación) para poder escanear
+dispositivos Bluetooth. Concede los permisos solicitados para que la lista de dispositivos se muestre correctamente.
+
+\section{Conectarse al ESP32}
+Enciende el ESP32 y abre la aplicación RC Controller. En la lista de dispositivos Bluetooth disponibles, selecciona
+el controlador ESP32.
+
+Una vez establecida la conexión, la interfaz de control se activa y la aplicación empieza a enviar datos de control
+al ESP32 (joysticks, perillas, interruptores y eventos de botones).
+
+\section{Estado de Conexión}
+La aplicación muestra el estado de conexión para confirmar que el enlace serie Bluetooth está activo.
+
+Del lado del firmware, un cliente conectado se detecta con \verb|SerialBT.hasClient()| (utilizado por el módulo
+de telemetría). Si el teléfono se desconecta, el firmware vuelve al estado de ``espera'' y la aplicación debe reconectar
+antes de que el control y la telemetría se reanuden.
+
+\section{Modo Debug (Ver la Comunicación Bluetooth)}
+El firmware incluye un sistema de depuración opcional que imprime datos del controlador ya decodificados en el Monitor
+Serie USB. Esta es la forma más rápida de confirmar que:
+\begin{itemize}
+    \item el teléfono está conectado al dispositivo ESP32 correcto,
+    \item los paquetes se están recibiendo y decodificando correctamente, y
+    \item los valores de sticks/perillas/interruptores cambian cuando mueves los controles en la app.
+\end{itemize}
+
+\subsection{Activar el Modo Debug}
+Abre el archivo:
+
+\begin{verbatim}
+    debug_config.h
+\end{verbatim}
+
+Activa la depuración estableciendo:
+
+\begin{verbatim}
+    #define DEBUG_ENABLED 1
+\end{verbatim}
+
+Desactiva la depuración estableciendo:
+
+\begin{verbatim}
+    #define DEBUG_ENABLED 0
+\end{verbatim}
+
+Cuando \verb|DEBUG_ENABLED| está activo, el repositorio también habilita categorías individuales de depuración:
+
+\begin{verbatim}
+    #define DBG_STICKS   1
+    #define DBG_KNOBS    1
+    #define DBG_SWITCHES 1
+    #define DBG_EVENTS   1
+\end{verbatim}
+
+Después de cambiar cualquier ajuste de depuración, compila y carga el firmware nuevamente en el ESP32.
+
+\subsection{Abrir el Monitor Serie}
+
+Abre el Monitor Serie del IDE de Arduino:
+
+\begin{verbatim}
+    Tools -> Serial Monitor
+\end{verbatim}
+
+Configura la velocidad (baud rate) en:
+
+\begin{verbatim}
+    115200
+\end{verbatim}
+
+Reinicia el ESP32 para ver los mensajes de arranque.
+
+\subsection{Salida de Depuración}
+
+Cuando el modo debug está habilitado, el ESP32 imprimirá mensajes de diagnóstico en el Monitor Serie.
+
+Mensajes típicos pueden incluir:
+
+\begin{verbatim}
+    [DEBUG] Bluetooth initialized
+    [DEBUG] Waiting for client connection
+    [DEBUG] Client connected
+\end{verbatim}
+
+Cuando se reciben comandos desde la aplicación Android, el ESP32 puede mostrar mensajes similares a:
+
+\begin{verbatim}
+    [DEBUG] Received command: BTN_A
+    [DEBUG] Joystick X: 120
+    [DEBUG] Joystick Y: 85
+\end{verbatim}
+
+Estos mensajes confirman que la comunicación Bluetooth entre el teléfono y el ESP32 está funcionando correctamente.
+
+\subsection{Solución de Problemas Usando el Modo Debug}
+
+Si la aplicación Android se conecta pero el robot no responde:
+
+\begin{itemize}
+    \item Verifica que aparezcan mensajes de depuración al presionar botones en la aplicación.
+    \item Si no aparece ningún mensaje, es posible que el ESP32 no esté recibiendo datos Bluetooth.
+    \item Comprueba que en la aplicación se haya seleccionado el dispositivo ESP32 correcto.
+    \item Verifica que el firmware se haya cargado correctamente.
+\end{itemize}
+
+Si aparecen mensajes de depuración pero el hardware no responde, el problema probablemente está relacionado con el cableado o con la configuración de pines.
+
+\section{Usar el Modo Debug para Verificar la Comunicación}
+
+El firmware incluye un sistema de depuración integrado que permite ver los datos que se reciben desde la aplicación Android.
+
+Esto es extremadamente útil para comprobar que la conexión Bluetooth funciona correctamente y que el ESP32 está recibiendo comandos de control.
+
+Todos los mensajes de depuración se muestran en el Monitor Serie del IDE de Arduino.
+
+\subsection{Paso 1: Activar el Modo Debug}
+
+Abre el archivo:
+
+\begin{verbatim}
+    debug_config.h
+\end{verbatim}
+
+Ubica la siguiente línea:
+
+\begin{verbatim}
+    #define DEBUG_ENABLED 1
+\end{verbatim}
+
+Ajusta el valor a:
+
+\begin{itemize}
+    \item \texttt{1} para habilitar la salida de depuración
+    \item \texttt{0} para deshabilitar la salida de depuración
+\end{itemize}
+
+Cuando la depuración está habilitada, el firmware imprimirá los datos de control recibidos desde la aplicación Android.
+
+Vuelve a cargar el firmware después de cualquier cambio.
+
+\subsection{Paso 2: Abrir el Monitor Serie}
+
+En el IDE de Arduino abre:
+
+\begin{verbatim}
+    Tools -> Serial Monitor
+\end{verbatim}
+
+Configura la velocidad a:
+
+\begin{verbatim}
+    115200
+\end{verbatim}
+
+Reinicia el ESP32 o presiona el botón de reset.
+
+El Monitor Serie empezará a mostrar mensajes de depuración.
+
+\subsection{Paso 3: Mover Controles en la App}
+
+Después de conectar la aplicación Android al ESP32, mueve los controles en pantalla:
+
+\begin{itemize}
+    \item Mueve los joysticks
+    \item Gira las perillas
+    \item Activa o desactiva los interruptores
+    \item Presiona botones
+\end{itemize}
+
+El ESP32 imprimirá los datos recibidos en el Monitor Serie.
+
+\section{Tipos de Salida de Depuración}
+
+El sistema de depuración puede imprimir diferentes categorías de información según la configuración en \texttt{debug\_config.h}.
+
+\subsection{Depuración de Joystick (Sticks)}
+
+Si la siguiente opción está habilitada:
+
+\begin{verbatim}
+    #define DBG_STICKS 1
+\end{verbatim}
+
+El ESP32 imprimirá las posiciones de los joysticks cuando cambien.
+
+Ejemplo:
+
+\begin{verbatim}
+    L Stick X: 512    L Stick Y: 510
+    L Stick X: 650    L Stick Y: 480
+
+    R Stick X: 300    R Stick Y: 700
+\end{verbatim}
+
+Estos valores representan la posición del joystick izquierdo y derecho en la aplicación Android.
+
+Rango típico:
+
+\begin{itemize}
+    \item Mínimo: alrededor de 0
+    \item Centro: alrededor de 512
+    \item Máximo: alrededor de 1023
+\end{itemize}
+
+Si los números cambian cuando mueves el joystick, la comunicación está funcionando correctamente.
+
+\subsection{Depuración de Perillas (Knobs)}
+
+Si la siguiente opción está habilitada:
+
+\begin{verbatim}
+    #define DBG_KNOBS 1
+\end{verbatim}
+
+El ESP32 imprimirá los valores de las perillas.
+
+Ejemplo:
+
+\begin{verbatim}
+    Left Knob: 340
+    Left Knob: 512
+    Left Knob: 890
+
+    Right Knob: 120
+    Right Knob: 780
+\end{verbatim}
+
+Estos valores corresponden a la rotación de las perillas en la aplicación Android.
+
+Las perillas pueden usarse para controlar parámetros como:
+
+\begin{itemize}
+    \item Velocidad del motor
+    \item Ángulo del servo
+    \item Intensidad de luz
+    \item Inclinación/paneo de cámara
+\end{itemize}
+
+\subsection{Depuración de Interruptores (Switches)}
+
+Si la siguiente opción está habilitada:
+
+\begin{verbatim}
+    #define DBG_SWITCHES 1
+\end{verbatim}
+
+El ESP32 mostrará el estado de los interruptores.
+
+Ejemplo:
+
+\begin{verbatim}
+    Switch Byte: 0x05
+    S1 = ON
+    S2 = OFF
+    S3 = ON
+    S4 = OFF
+    S5 = OFF
+    S6 = OFF
+\end{verbatim}
+
+Cada interruptor corresponde a un botón tipo toggle en la aplicación Android.
+
+Estos interruptores se usan comúnmente para:
+
+\begin{itemize}
+    \item Encender y apagar luces
+    \item Activar relés
+    \item Cambiar modos de conducción
+    \item Habilitar funciones autónomas
+\end{itemize}
+
+\subsection{Depuración de Eventos}
+
+Si la siguiente opción está habilitada:
+
+\begin{verbatim}
+    #define DBG_EVENTS 1
+\end{verbatim}
+
+El ESP32 imprimirá un mensaje cuando llegue un paquete de evento.
+
+Ejemplo:
+
+\begin{verbatim}
+    --- EVENT PACKET (PRESS) ---
+    Event ID: 0x03
+    Checksum: 0x7A
+    --------------
+\end{verbatim}
+
+Los eventos se disparan cuando el usuario presiona un botón en la aplicación Android.
+
+Usos típicos:
+
+\begin{itemize}
+    \item Activar una función especial
+    \item Reiniciar un sistema
+    \item Disparar un sonido o animación
+    \item Lanzar una acción en el robot
+\end{itemize}
+
+\section{Depuración del Sistema de Telemetría}
+
+El firmware incluye un sistema de telemetría que permite al ESP32 enviar
+información en tiempo real de vuelta a la aplicación Android.
+
+La telemetría puede incluir:
+
+\begin{itemize}
+    \item Valores numéricos
+    \item Indicadores
+    \item Gráficas en tiempo real
+\end{itemize}
+
+Para desarrollo y pruebas, el firmware proporciona un sistema de depuración de telemetría
+que permite simular valores mediante el Monitor Serie del IDE de Arduino.
+
+Este sistema se configura en el archivo:
+
+\begin{center}
+    \texttt{debug\_config.h}
+\end{center}
+
+Dentro de este archivo puedes seleccionar el modo de depuración de telemetría:
+
+\begin{verbatim}
+    #define DBG_NONE        0
+    #define DBG_PANEL       1
+    #define DBG_INDICATOR   2
+    #define DBG_PLOT        3
+
+    #define TELEMETRY_DEBUG_MODE DBG_INDICATOR
+\end{verbatim}
+
+Solo debe estar activo un modo de depuración a la vez.
+
+\subsection{Operación Normal}
+
+\begin{verbatim}
+    #define TELEMETRY_DEBUG_MODE DBG_NONE
+\end{verbatim}
+
+En este modo el ESP32 obtiene valores de telemetría desde sensores reales de hardware.
+
+Ejemplos:
+
+\begin{itemize}
+    \item sensores analógicos
+    \item medición de voltaje de batería
+    \item entradas digitales
+\end{itemize}
+
+Este modo debe usarse cuando el robot o proyecto esté completamente armado.
+
+\subsection{Modo Debug de Panel Numérico}
+
+\begin{verbatim}
+    #define TELEMETRY_DEBUG_MODE DBG_PANEL
+\end{verbatim}
+
+Este modo permite probar los paneles numéricos de telemetría sin conectar sensores.
+
+Cuando este modo está habilitado, los valores ingresados en el Monitor Serie se interpretan y se envían
+a la aplicación Android como telemetría de panel numérico.
+
+\subsubsection{Formato de entrada en el Monitor Serie}
+
+Abre el Monitor Serie del IDE de Arduino y envía valores con el siguiente formato:
+
+\begin{verbatim}
+    LEFT_VALUE,RIGHT_VALUE
+\end{verbatim}
+
+Ambos valores pueden incluir parte decimal.
+
+Ejemplos:
+
+\begin{verbatim}
+    12.3,45.8
+    120.0,350.5
+    5,10
+\end{verbatim}
+
+\subsubsection{Conversión de valores}
+
+Los valores ingresados en el Monitor Serie se convierten internamente al formato de telemetría usado por el firmware.
+
+Cada valor se multiplica por 10 y se convierte a entero antes de transmitirse a la aplicación Android.
+
+Ejemplos:
+
+\begin{itemize}
+    \item 12.3 se convierte en 123
+    \item 45.8 se convierte en 458
+    \item 120.0 se convierte en 1200
+\end{itemize}
+
+Del lado Android, el valor entero recibido se divide por 10 para mostrar el valor decimal correcto en el panel numérico.
+
+\subsubsection{Rango válido}
+
+El rango permitido para cada valor numérico es:
+
+\begin{itemize}
+    \item 0.0 a 6553.5
+\end{itemize}
+
+Este rango corresponde al valor máximo transmisible usando un entero sin signo de 16 bits con una cifra decimal de precisión.
+
+\subsubsection{Ejemplo}
+
+Si se ingresa el siguiente valor en el Monitor Serie:
+
+\begin{verbatim}
+    123.4,56.7
+\end{verbatim}
+
+El firmware transmitirá:
+
+\begin{verbatim}
+    1234,567
+\end{verbatim}
+
+La aplicación Android mostrará:
+
+\begin{verbatim}
+    123.4   56.7
+\end{verbatim}
+
+en los paneles numéricos izquierdo y derecho respectivamente.
+
+Este modo es útil para verificar la transmisión de telemetría y la interfaz Android antes de conectar sensores reales.
+
+\subsection{Modo Debug de Indicadores}
+
+\begin{verbatim}
+    #define TELEMETRY_DEBUG_MODE DBG_INDICATOR
+\end{verbatim}
+
+Este modo permite probar widgets de indicadores.
+
+Envía valores por el Monitor Serie usando este formato:
+
+\begin{verbatim}
+    ANALOG_VALUE,BATTERY_LEVEL,DIGITAL_MASK
+\end{verbatim}
+
+Ejemplo:
+
+\begin{verbatim}
+    45,80,5
+\end{verbatim}
+
+Rangos:
+
+\begin{itemize}
+    \item Valor analógico: 0 a 100
+    \item Nivel de batería: 0 a 100
+    \item Máscara digital: 0 a 255
+\end{itemize}
+
+La máscara digital representa el estado de indicadores digitales usando flags por bits.
+
+Ejemplos:
+
+\begin{verbatim}
+    1
+    2
+    4
+    8
+\end{verbatim}
+
+Cada valor activa un indicador diferente.
+
+Se pueden activar múltiples indicadores combinando valores.
+
+Ejemplo:
+
+\begin{verbatim}
+    3
+\end{verbatim}
+
+Representación binaria:
+
+\begin{verbatim}
+    00000011
+\end{verbatim}
+
+Esto activa los dos primeros indicadores.
+
+\subsection{Modo Debug de Gráficas (Plot)}
+
+\begin{verbatim}
+    #define TELEMETRY_DEBUG_MODE DBG_PLOT
+\end{verbatim}
+
+Este modo simula tres señales de telemetría que se muestran como gráficas en tiempo real en la aplicación Android.
+
+Envía valores usando el Monitor Serie:
+
+\begin{verbatim}
+    VALUE1,VALUE2,VALUE3
+\end{verbatim}
+
+Ejemplo:
+
+\begin{verbatim}
+    10,40,80
+\end{verbatim}
+
+Rango válido:
+
+\begin{itemize}
+    \item 0 a 255
+\end{itemize}
+
+Estos valores aparecerán en las gráficas de telemetría de la aplicación.
+
+\subsection{Cómo Funciona el Sistema de Depuración de Telemetría}
+
+Los valores de depuración son leídos por el módulo:
+
+\begin{center}
+    \texttt{telemetry\_source.cpp}
+\end{center}
+
+Este módulo reemplaza valores de sensores reales por valores recibidos vía interfaz serie cuando hay un modo debug activo.
+
+Los paquetes de telemetría se crean y transmiten mediante:
+
+\begin{center}
+    \texttt{telemetry.cpp}
+\end{center}
+
+Este módulo arma paquetes de telemetría y los envía a la aplicación Android usando Bluetooth.
+
+Esta arquitectura permite probar la interfaz de telemetría sin conectar sensores físicos.
+
+\section{Por Qué el Modo Debug es Importante}
+
+El modo debug permite verificar rápidamente que:
+
+\begin{itemize}
+    \item La aplicación Android está conectada
+    \item Se están recibiendo datos por Bluetooth
+    \item Los valores de control cambian correctamente
+\end{itemize}
+
+Si los valores aparecen en el Monitor Serie pero el hardware no responde, el problema probablemente está en el cableado de hardware o en la configuración del firmware, y no en la conexión Bluetooth.
+
+\section{Personalizar Etiquetas de Telemetría en la Aplicación Android}
+
+La aplicación Android muestra automáticamente etiquetas para valores de telemetría
+como paneles numéricos, indicadores y gráficas.
+
+Estas etiquetas se definen en el firmware del ESP32 y se envían a la aplicación
+cuando se establece la conexión Bluetooth.
+
+Esto permite personalizar la interfaz sin modificar la aplicación Android.
+
+\subsection{Dónde se Definen las Etiquetas}
+
+Las etiquetas de telemetría se definen dentro del archivo:
+
+\begin{center}
+    \texttt{telemetry.cpp}
+\end{center}
+
+Dentro de la función encargada de enviar la configuración de telemetría, encontrarás estas variables:
+
+\begin{verbatim}
+    const char* plotNames[] = { "Volts", "Amps", "RPMs" };
+    const char* panelNames[] = { "Left", "Right" };
+    const char* indicatorNames[] = { "Throttle", "Battery" };
+\end{verbatim}
+
+Estos arreglos definen las etiquetas que aparecen en la pantalla RC de la aplicación Android.
+
+\subsection{Etiquetas de Gráficas (Plot)}
+
+El arreglo \texttt{plotNames} define los nombres de las gráficas en tiempo real.
+
+Ejemplo:
+
+\begin{verbatim}
+    const char* plotNames[] = { "Volts", "Amps", "RPMs" };
+\end{verbatim}
+
+En la aplicación Android esto creará tres gráficas con las etiquetas:
+
+\begin{itemize}
+    \item Volts
+    \item Amps
+    \item RPMs
+\end{itemize}
+
+Puedes renombrarlas para que coincidan con tus sensores.
+
+Ejemplo para un robot tipo auto:
+
+\begin{verbatim}
+    const char* plotNames[] = { "Speed", "Motor Temp", "Battery Current" };
+\end{verbatim}
+
+\subsection{Etiquetas de Panel Numérico}
+
+El arreglo \texttt{panelNames} define las etiquetas de los paneles numéricos grandes.
+
+Ejemplo:
+
+\begin{verbatim}
+    const char* panelNames[] = { "Left", "Right" };
+\end{verbatim}
+
+Usos típicos:
+
+\begin{itemize}
+    \item Velocidad de motor
+    \item Distancia
+    \item RPM
+    \item Temperatura
+\end{itemize}
+
+Ejemplo de modificación:
+
+\begin{verbatim}
+    const char* panelNames[] = { "Motor RPM", "Battery Voltage" };
+\end{verbatim}
+
+Nota: se recomienda usar un máximo de 12 caracteres.
+
+\subsection{Etiquetas de Indicadores}
+
+El arreglo \texttt{indicatorNames} define las etiquetas de los widgets de indicadores.
+
+Ejemplo:
+
+\begin{verbatim}
+    const char* indicatorNames[] = { "Throttle", "Battery" };
+\end{verbatim}
+
+Posibles usos:
+
+\begin{itemize}
+    \item Posición del acelerador
+    \item Nivel de batería
+    \item Temperatura
+    \item Intensidad de señal
+\end{itemize}
+
+Ejemplo de modificación:
+
+\begin{verbatim}
+    const char* indicatorNames[] = { "Engine Load", "Battery Level" };
+\end{verbatim}
+
+\subsection{Cuándo se Envían las Etiquetas}
+
+Las etiquetas de telemetría se transmiten solo una vez después de que la aplicación Android se conecta al ESP32.
+
+El firmware envía un paquete de configuración de telemetría que incluye:
+
+\begin{itemize}
+    \item etiquetas de gráficas
+    \item etiquetas de paneles numéricos
+    \item etiquetas de indicadores
+\end{itemize}
+
+Después de recibir este paquete, la aplicación Android actualiza automáticamente la interfaz de la pantalla RC.
+
+\subsection{Notas Importantes}
+
+\begin{itemize}
+    \item El número de etiquetas debe coincidir con el número de variables de telemetría.
+    \item Después de modificar las etiquetas, debes volver a cargar el firmware.
+    \item La aplicación Android actualizará las etiquetas automáticamente tras reconectar.
+\end{itemize}

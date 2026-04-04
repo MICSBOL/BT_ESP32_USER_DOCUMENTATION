@@ -1,0 +1,114 @@
+\chapter{Diagramas de Cableado}
+
+Este capítulo muestra ejemplos básicos de cableado para proyectos comunes usando el firmware del Controlador RC con ESP32.
+
+Estos diagramas están simplificados para que los principiantes puedan entender rápidamente cómo conectar el hardware.
+
+\section{Cableado Básico de Robot}
+
+El proyecto más común es un robot de tracción diferencial simple usando dos motores.
+
+% Requiere: \usetikzlibrary{positioning,arrows.meta,calc}
+% (Ya cargas positioning+arrows.meta en main.tex.)
+% Diseño más angosto (menos ancho) y opcionalmente más alto.
+% Usa un flujo mayormente vertical: Teléfono -> ESP32 -> Driver, con motores ramificando a la derecha.
+% Requiere: \usetikzlibrary{positioning,arrows.meta,calc}
+
+\begin{center}
+    \begin{tikzpicture}[
+        font=\small,
+        >=Stealth,
+        node distance=22mm and 34mm, % espaciado más ajustado (vertical y horizontal)
+        box/.style={
+            draw,
+            rounded corners=2mm,
+            very thick,
+            align=center,
+            minimum width=36mm,  % ancho reducido
+            minimum height=14mm, % ligeramente más alto
+            fill=gray!6
+        },
+        boxAccent/.style={
+            box,
+            fill=blue!6,
+            draw=blue!60!black
+        },
+        boxHW/.style={
+            box,
+            fill=green!6,
+            draw=green!50!black
+        },
+        arrow/.style={->, very thick, draw=black!70},
+        label/.style={midway, fill=white, inner sep=1.5pt, text=black!80, font=\scriptsize}
+        ]
+
+        % Nodos (apilados verticalmente para reducir el ancho)
+        \node[boxAccent] (phone) {App\\Android};
+        \node[boxAccent, below=of phone] (esp32) {ESP32\\Controlador};
+        \node[boxHW, below=of esp32] (driver) {Driver\\de Motor};
+
+        % Los motores se ramifican a la derecha (compacto)
+        \node[boxHW, right=16mm of driver, yshift=+9mm] (motorL) {Motor\\Izquierdo};
+        \node[boxHW, right=16mm of driver, yshift=-9mm] (motorR) {Motor\\Derecho};
+
+        % Flechas + etiquetas
+        \draw[arrow] (phone) -- node[label, right]{Bluetooth SPP} (esp32);
+        \draw[arrow] (esp32) -- node[label, right, yshift=-3mm]{PWM + DIR} (driver);
+
+        \draw[arrow] (driver.east) -- node[label, above, sloped]{Potencia} (motorL.west);
+        \draw[arrow] (driver.east) -- node[label, below, sloped]{Potencia} (motorR.west);
+
+        % Agrupación opcional sutil
+        \draw[dashed, rounded corners=2mm, draw=black!30]
+        ($(phone.north west)+(-4mm,4mm)$) rectangle ($(esp32.south east)+(4mm,-4mm)$);
+        \node[font=\normalsize, text=black!60] at ($(phone.west)!0.5!(esp32.north)-(3.5,6mm)$) {Enlace de Control};
+
+        \draw[dashed, rounded corners=2mm, draw=black!30]
+        ($(driver.north west)+(-4mm,12mm)$) rectangle ($(motorR.south east)+(4mm,-4mm)$);
+        \node[font=\normalsize, text=black!60] at ($(driver.north)!0.55!(motorL.north)+(11mm,10mm)$) {Etapa de Potencia};
+
+    \end{tikzpicture}
+\end{center}
+
+\section{Ejemplo de Control de Servo}
+
+Los servos pueden conectarse directamente a pines PWM del ESP32.
+
+\begin{itemize}
+    \item Señal del servo → pin GPIO del ESP32
+    \item Alimentación del servo → fuente de 5V
+    \item Tierra del servo → tierra común
+\end{itemize}
+
+Ejemplos de uso:
+
+\begin{itemize}
+    \item Control de dirección
+    \item Control de paneo de cámara
+    \item Articulaciones de brazo robótico
+\end{itemize}
+
+\section{Salidas para LED y Zumbador}
+
+Las salidas digitales pueden controlar LEDs o zumbadores.
+
+Conexiones de ejemplo:
+
+\begin{itemize}
+    \item Pin GPIO → LED (con resistencia)
+    \item Pin GPIO → módulo zumbador
+\end{itemize}
+
+Estas salidas pueden controlarse usando botones o interruptores en la aplicación Android.
+
+\section{Conexiones de Sensores}
+
+Los sensores pueden conectarse usando:
+
+\begin{itemize}
+    \item Entradas analógicas
+    \item Entradas digitales
+    \item Interfaz I2C
+\end{itemize}
+
+El firmware permite transmitir datos de sensores a la aplicación Android mediante telemetría.

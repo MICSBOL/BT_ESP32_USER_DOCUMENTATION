@@ -1,0 +1,190 @@
+\chapter{Customizing Your Project}
+
+This chapter explains the recommended way to extend the firmware in
+\texttt{MICSBOL/ESP32\_BT\_Controller}. The repository is organized so that:
+
+\begin{itemize}
+    \item \textbf{Pin mapping is centralized} in \texttt{pins.h} and depends on the build mode selected
+    via \texttt{PROJECT\_MODE}.
+    \item \textbf{Hardware readings} (ADC/GPIO/I\textsuperscript{2}C) are collected in dedicated modules such as
+    \texttt{input\_hw.*} (ADC/digital reads) and \texttt{i2c\_sensors.*}.
+    \item \textbf{Telemetry packets} are built and transmitted in \texttt{telemetry.cpp}, but the \emph{values}
+    come from a separate provider module, \texttt{telemetry\_source.*}.
+    \item \textbf{Optional GPIO expansion} (MCP23017) is handled through \texttt{mcp\_io.*} and the mode-dependent
+    mapping in \texttt{pins.h}.
+\end{itemize}
+
+\section{Pin Mapping (pins.h) and Project Modes}
+
+The repository defines two wiring modes in \texttt{pins.h}:
+
+\begin{itemize}
+    \item \textbf{Direct ESP32 mode} (\texttt{PROJECT\_MODE == FULL\_RC\_MODE}): most I/O is on ESP32 GPIO pins.
+    \item \textbf{MCP expansion mode} (\texttt{PROJECT\_MODE == FULL\_RC\_MODE\_MCP}): digital I/O is expanded using an
+    MCP23017 over I\textsuperscript{2}C, while PWM outputs remain on the ESP32.
+\end{itemize}
+
+\subsection{I\textsuperscript{2}C bus (reserved / MCP bus)}
+In both modes, \texttt{pins.h} reserves the ESP32 I\textsuperscript{2}C bus on:
+
+\begin{itemize}
+    \item \texttt{PIN\_I2C\_SDA = 21}
+    \item \texttt{PIN\_I2C\_SCL = 22}
+\end{itemize}
+
+In MCP mode, these pins are used for ESP32 $\leftrightarrow$ MCP23017 communication (and can also be shared with other
+I\textsuperscript{2}C sensors if the bus is designed correctly).
+
+\subsection{PWM outputs (6 total)}
+In both modes, \texttt{pins.h} defines six PWM outputs on the ESP32:
+
+\begin{itemize}
+    \item \texttt{PIN\_PWM\_STICK\_LX = 18}
+    \item \texttt{PIN\_PWM\_STICK\_LY = 19}
+    \item \texttt{PIN\_PWM\_STICK\_RX = 23}
+    \item \texttt{PIN\_PWM\_STICK\_RY = 25}
+    \item \texttt{PIN\_PWM\_KNOB\_L = 26}
+    \item \texttt{PIN\_PWM\_KNOB\_R = 27}
+\end{itemize}
+
+These channels are typically used for servos, motor PWM inputs, or other analog-style outputs.
+
+\subsection{Motor direction outputs (2)}
+Both modes define two direction outputs intended for motor drivers:
+
+\begin{itemize}
+    \item \texttt{PIN\_MD\_LEFT = 12} \quad (note in repository: \emph{keep LOW at boot})
+    \item \texttt{PIN\_MD\_RIGHT = 15} \quad (note in repository: \emph{keep LOW at boot})
+\end{itemize}
+
+\paragraph{Boot-safety note}
+The comments in \texttt{pins.h} warn that these pins should be kept LOW at boot. When customizing,
+avoid external pull-ups or circuits that drive these pins HIGH during reset.
+
+\subsection{Analog inputs (ADC1-safe)}
+The repository explicitly uses ADC1 pins for analog inputs (recommended when Bluetooth is used).
+However, the actual pin numbers differ by mode:
+
+\paragraph{Direct ESP32 mode (\texttt{FULL\_RC\_MODE})}
+\begin{itemize}
+    \item \texttt{PIN\_NUMERIC1 = 34}
+    \item \texttt{PIN\_NUMERIC2 = 35}
+    \item \texttt{PIN\_ANALOG\_IND1 = 36}
+    \item \texttt{PIN\_ANALOG\_IND2 = 39}
+\end{itemize}
+
+\paragraph{MCP expansion mode (\texttt{FULL\_RC\_MODE\_MCP})}
+\begin{itemize}
+    \item \texttt{PIN\_NUMERIC1 = 32}
+    \item \texttt{PIN\_NUMERIC2 = 33}
+    \item \texttt{PIN\_ANALOG\_IND1 = 34}
+    \item \texttt{PIN\_ANALOG\_IND2 = 35}
+\end{itemize}
+
+\paragraph{Practical implication}
+If you switch project modes, you \textbf{must} re-check the wiring for analog sensors because the numeric/indicator
+ADC pins change between modes.
+
+\subsection{Digital inputs (indicators) in direct mode}
+In direct ESP32 mode, \texttt{pins.h} defines four digital indicator inputs:
+
+\begin{itemize}
+    \item \texttt{PIN\_IND1 = 4}
+    \item \texttt{PIN\_IND2 = 5}
+    \item \texttt{PIN\_IND3 = 2}
+    \item \texttt{PIN\_IND4 = 0} \quad (repository note: \emph{careful: avoid pull-up at boot})
+\end{itemize}
+
+\paragraph{GPIO0 boot warning}
+Because \texttt{PIN\_IND4} uses GPIO0 in direct mode, avoid wiring that forces GPIO0 HIGH/LOW at reset in a way that
+puts the ESP32 into the wrong boot mode.
+
+\subsection{Switch outputs (direct mode)}
+In direct mode, the repository defines switch outputs on ESP32 pins:
+
+\begin{itemize}
+    \item \texttt{PIN\_SW1 = 16}
+    \item \texttt{PIN\_SW2 = 17}
+    \item \texttt{PIN\_SW3 = 13}
+    \item \texttt{PIN\_SW4 = 14}
+\end{itemize}
+
+\paragraph{Important}
+In the current \texttt{pins.h} snapshot, only \texttt{PIN\_SW1} through \texttt{PIN\_SW4} are defined in direct mode,
+even though other parts of the system refer to ``Switches 1--6'' conceptually. If your project needs SW5/SW6 in direct
+mode, you must assign additional GPIO pins in \texttt{pins.h} and update the output layer accordingly.
+
+\subsection{Pulse outputs (Android event buttons)}
+Pulse outputs are intended for momentary actions triggered by Android event buttons.
+
+\paragraph{Direct ESP32 mode}
+\begin{itemize}
+    \item \texttt{PIN\_PULSE1 = 32}
+    \item \texttt{PIN\_PULSE2 = 33}
+\end{itemize}
+
+\paragraph{MCP expansion mode}
+In MCP mode, \texttt{pins.h} assigns four pulse outputs on ESP32 GPIOs:
+\begin{itemize}
+    \item \texttt{PIN\_PULSE1 = 4}
+    \item \texttt{PIN\_PULSE2 = 5}
+    \item \texttt{PIN\_PULSE3 = 13}
+    \item \texttt{PIN\_PULSE4 = 14}
+\end{itemize}
+
+\section{Adding Sensors (Telemetry Sources)}
+
+The cleanest way to add sensors is to feed their measurements into the existing telemetry channels. The provider
+API is declared in \texttt{telemetry\_source.h}:
+
+\begin{itemize}
+    \item \textbf{Panels:} \verb|getPanelLeft()| and \verb|getPanelRight()| return 16-bit values.
+    \item \textbf{Indicators:} \verb|getIndicatorAnalog()|, \verb|getIndicatorBattery()|, and
+    \verb|getIndicatorDigitalMask()| return 8-bit values.
+    \item \textbf{Plots:} \verb|getPlot1()|, \verb|getPlot2()|, and \verb|getPlot3()| return 8-bit values.
+\end{itemize}
+
+\subsection{Analog sensors}
+A typical workflow:
+\begin{enumerate}
+    \item Choose an ADC pin from the correct mode section of \texttt{pins.h}.
+    \item Implement scaling/conversion in \texttt{input\_hw.cpp} (see functions like \verb|hwReadPlot1()|,
+    \verb|hwReadIndicatorAnalog()|, etc., declared in \texttt{input\_hw.h}).
+    \item Return the processed value in \texttt{telemetry\_source.cpp} via \verb|getPlotX()| / \verb|getIndicator...()|.
+\end{enumerate}
+
+\subsection{I\textsuperscript{2}C sensors}
+The repository provides I\textsuperscript{2}C helpers in \texttt{i2c\_sensors.*} (e.g., \verb|i2cReadTemp()| and
+\verb|i2cReadIMU(...)| in \texttt{i2c\_sensors.h}). To add another device:
+\begin{enumerate}
+    \item Wire SDA/SCL to \texttt{PIN\_I2C\_SDA}/\texttt{PIN\_I2C\_SCL}.
+    \item Add a read function in \texttt{i2c\_sensors.cpp/.h}.
+    \item Publish the value through \texttt{telemetry\_source.cpp}.
+\end{enumerate}
+
+\section{Using MCP23017 (GPIO Expansion)}
+
+In MCP mode, \texttt{pins.h} documents the intended digital mapping:
+\begin{itemize}
+    \item \textbf{GPA0--GPA7} $\rightarrow$ 8 Digital Indicators (INPUTS)
+    \item \textbf{GPB0--GPB5} $\rightarrow$ 6 Switch Outputs
+    \item \textbf{GPB6--GPB7} $\rightarrow$ 2 Free for you to use Outputs
+\end{itemize}
+
+The MCP interface in \texttt{mcp\_io.h} provides:
+\begin{itemize}
+    \item \verb|mcpInit()|
+    \item \verb|mcpReadDigitalInputs()| (reads port A)
+    \item \verb|mcpWriteOutput(...)| and \verb|mcpWritePortB(...)| (writes port B)
+\end{itemize}
+
+\section{Practical Checklist When Customizing}
+
+\begin{itemize}
+    \item \textbf{Always start by checking \texttt{pins.h} for your selected mode}: analog and pulse pins change between modes.
+    \item \textbf{Be careful with boot-sensitive pins}: GPIO0 and GPIO12/15 have explicit boot-related warnings in the repository.
+    \item \textbf{If you need more digital I/O, prefer MCP mode}: it cleanly expands indicators and switch outputs over I\textsuperscript{2}C.
+    \item \textbf{Change one thing at a time}: update wiring, then update \texttt{pins.h}/read functions, then test telemetry and outputs.
+    \item \textbf{Flashing recommendation}: upload the firmware with the ESP32 \textbf{fully disconnected from external hardware} (motors, servos, relays, sensors, and especially any wiring to boot/strapping pins). This prevents upload failures caused by electrical noise, power sag, or pins being forced to the wrong logic level during boot.
+    \item \textbf{If uploads fail}: disconnect everything external first, try a different USB cable/port, and if your board requires it hold the \textbf{BOOT} button when the upload starts. Reconnect external hardware \textbf{only after} you confirm the firmware boots correctly.
+\end{itemize}

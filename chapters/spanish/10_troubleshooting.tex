@@ -1,0 +1,179 @@
+\chapter{Solución de Problemas}
+\label{ch:troubleshooting}
+
+Si tu proyecto no funciona como se espera, este capítulo te ayuda a identificar problemas comunes en
+\textbf{ambos lados del sistema}:
+
+\begin{itemize}
+    \item \textbf{Android (EmitterApp):} controles de la interfaz, emparejamiento/conexión Bluetooth y si se están procesando comandos/telemetría.
+    \item \textbf{ESP32 (ESP32\_BT\_Controller):} carga del firmware, cableado de pines, integridad de alimentación, enlace Bluetooth SPP y generación de telemetría.
+\end{itemize}
+
+\section{Antes de Empezar: Lista Rápida}
+\label{sec:quick-checklist}
+
+\begin{itemize}
+    \item Confirma que el ESP32 está alimentado y estable (sin brownouts/resets).
+    \item Confirma que tu dispositivo Android está emparejado con el nombre Bluetooth correcto (por defecto es \texttt{ESP32-BT}).
+    \item Mantén el teléfono a pocos metros para las pruebas iniciales.
+    \item Asegúrate de que \textbf{todas las tierras sean comunes} (ESP32, driver de motor, sensores, fuente externa de 5V/alimentación de servos).
+    \item Si estás usando pines sensibles al arranque (por ejemplo, GPIO0), desconecta temporalmente los circuitos externos durante el flasheo.
+\end{itemize}
+
+\section{El Firmware del ESP32 No Se Carga}
+\label{sec:esp32-upload}
+
+Si el firmware no se carga correctamente:
+
+\begin{itemize}
+    \item Verifica que la placa/target correcto esté seleccionado en tu IDE/herramientas.
+    \item Confirma que el puerto serie correcto esté seleccionado.
+    \item Prueba con otro cable USB (muchos cables ``solo carga'' causan fallos de carga).
+    \item Mantén presionado \textbf{BOOT} durante la carga si tu placa requiere entrada manual al bootloader.
+    \item Desconecta el cableado externo de los \textbf{pines de arranque (boot-strap)} durante el flasheo (los más comunes son GPIO0 y GPIO2).
+\end{itemize}
+
+\subsection*{Notas sobre pines de arranque (importante)}
+La configuración de pines del firmware usa GPIO0 como entrada digital de indicador (\texttt{PIN\_IND4 = GPIO0}) en
+\texttt{FULL\_RC\_MODE}. GPIO0 es un pin de arranque: resistencias pull-up/pull-down externas pueden impedir el arranque o el flasheo.
+Si el flasheo falla, desconecta cualquier cosa conectada a GPIO0, flashea de nuevo y luego vuelve a conectar.
+
+\section{El ESP32 Enciende pero Se Reinicia Aleatoriamente}
+\label{sec:esp32-resets}
+
+Los reinicios aleatorios suelen estar relacionados con la alimentación:
+
+\begin{itemize}
+    \item Los motores/servos pueden bajar el voltaje de forma repentina. Usa un regulador dedicado para el ESP32 y una fuente separada para motores/servos.
+    \item Asegúrate de que la fuente del ESP32 pueda entregar corriente pico (ráfagas de Wi-Fi/Bluetooth pueden causar caídas).
+    \item Agrega capacitancia de reserva cerca de drivers de motor/riel de servos (p.\ ej., 470--1000~\(\mu\)F) y un capacitor cerámico más pequeño cerca del ESP32.
+    \item Revisa si los reguladores de las placas de desarrollo se sobrecalientan cuando se alimentan servos desde el mismo riel de 5V (no recomendado).
+\end{itemize}
+
+\section{Problemas de Emparejamiento y Conexión Bluetooth (Android \texorpdfstring{$\leftrightarrow$}{<->} ESP32)}
+\label{sec:bluetooth-problems}
+
+\subsection*{Síntoma: El dispositivo no aparece en el escaneo}
+\begin{itemize}
+    \item Confirma que el ESP32 está alimentado y ejecutándose (LED/indicadores de actividad si están disponibles).
+    \item Asegúrate de que el teléfono esté cerca del ESP32.
+    \item Apaga y vuelve a encender el ESP32.
+\end{itemize}
+
+\subsection*{Síntoma: El emparejamiento pide PIN o falla}
+El PIN por defecto normalmente es \texttt{1234}.
+\begin{itemize}
+    \item Elimina (``olvida'') el dispositivo en la configuración Bluetooth de Android y empareja de nuevo.
+    \item Intenta emparejar primero en la configuración del sistema Android y luego conéctate desde la app.
+\end{itemize}
+
+\subsection*{Síntoma: La app dice ``Connected'' pero los controles no hacen nada}
+\begin{itemize}
+    \item Verifica que te conectaste al dispositivo correcto (si hay varios \texttt{ESP32-BT} cerca).
+    \item Confirma que el ESP32 está ejecutando el build de firmware esperado (no un sketch viejo).
+    \item Del lado del ESP32, usa logging serial (si está habilitado) para confirmar que llegan paquetes de comandos.
+\end{itemize}
+
+\subsection*{Síntoma: Se conecta y luego se desconecta repetidamente}
+\begin{itemize}
+    \item Esto suele ser un problema de \textbf{estabilidad de alimentación} en el ESP32 (ver Sección~\ref{sec:esp32-resets}).
+    \item Reduce la carga de motores/servos durante las pruebas iniciales (desconecta motores, prueba primero con LEDs).
+    \item Mantén el teléfono cerca y evita carcasas metálicas que bloqueen Bluetooth.
+\end{itemize}
+
+\section{Los Controles Se Sienten Mal en la App (Lado Android)}
+\label{sec:android-controls}
+
+\subsection*{El joystick vuelve al centro vs se queda fijo}
+EmitterApp soporta diferentes modos de joystick (por ejemplo, spring vs hold). Si el robot se comporta
+como si la aceleración ``no se quedara'' o la dirección estuviera ``pegada'':
+
+\begin{itemize}
+    \item Revisa los modos de stick seleccionados en la configuración de la app.
+    \item Para aceleración, muchos usuarios prefieren el comportamiento \textbf{hold}; para dirección, muchos prefieren \textbf{spring}.
+\end{itemize}
+
+\subsection*{Los botones/interruptores aparecen pero no afectan el hardware}
+\begin{itemize}
+    \item Confirma que el firmware del ESP32 mapea esos canales a pines/salidas reales en el modo de proyecto elegido.
+    \item Si usas \texttt{FULL\_RC\_MODE\_MCP}, verifica el cableado del MCP23017 y la configuración de la dirección I2C (dirección por defecto \texttt{0x20}).
+\end{itemize}
+
+\section{Los Motores No Se Mueven}
+\label{sec:motors}
+
+\subsection*{Verificaciones eléctricas}
+\begin{itemize}
+    \item Revisa la alimentación del driver de motor y la polaridad.
+    \item Confirma que la \textbf{tierra lógica} del driver esté conectada a la tierra del ESP32.
+    \item Confirma que las salidas del driver estén conectadas a los terminales del motor (invierte cables si la dirección está al revés).
+\end{itemize}
+
+\subsection*{Verificación de señales}
+\begin{itemize}
+    \item Confirma que los pines PWM coincidan con tu cableado. En el mapeo de pines por defecto, los canales PWM incluyen:
+    GPIO18/19/23/25/26/27.
+    \item Confirma que los pines de dirección estén conectados correctamente:
+    \texttt{PIN\_MD\_LEFT = GPIO12} y \texttt{PIN\_MD\_RIGHT = GPIO15} (ambos deben mantenerse en low al arranque).
+    \item Si tu driver necesita dos pines de dirección por motor (IN1/IN2), debes adaptar el cableado/el firmware en consecuencia.
+\end{itemize}
+
+\subsection*{Consejo práctico de depuración}
+Prueba las salidas de motor con un simple ``LED + resistencia'' en el pin PWM primero (deberías ver cambios de brillo con el movimiento del stick),
+y luego conecta el driver de motor.
+
+\section{El Servo No Responde o Tiembla}
+\label{sec:servo}
+
+\begin{itemize}
+    \item Asegúrate de que el servo tenga una fuente de 5V adecuada ( \textbf{no} alimentes servos medianos/grandes desde la placa del ESP32).
+    \item Confirma que la tierra del servo esté unida a la tierra del ESP32.
+    \item Verifica que la señal de control esté cableada a un pin de salida PWM configurado (por ejemplo, GPIO23 o GPIO25).
+    \item Si el servo tiembla, agrega una mejor fuente de alimentación y reduce el ruido eléctrico (cables más cortos, capacitores, rieles de alimentación separados).
+\end{itemize}
+
+\section{Los Datos de Telemetría No Aparecen en la App}
+\label{sec:telemetry}
+
+\subsection*{Síntoma: Conectado, pero los widgets de telemetría no se actualizan}
+\begin{itemize}
+    \item Espera unos segundos después de conectar: el ESP32 envía la configuración a la app en la primera conexión.
+    \item Verifica que el sensor esté cableado al tipo de entrada correcto:
+    \begin{itemize}
+        \item Telemetría analógica: usa pines ADC1 (p.\ ej., GPIO34/35/36/39 en \texttt{FULL\_RC\_MODE}).
+        \item Indicadores digitales: GPIO4/5/2/0 (nota: precaución de arranque en GPIO0).
+        \item Sensores I2C: SDA GPIO21, SCL GPIO22.
+    \end{itemize}
+    \item Si estás usando \texttt{FULL\_RC\_MODE\_MCP}, confirma que el MCP23017 se detecte y esté cableado correctamente.
+\end{itemize}
+
+\subsection*{Síntoma: La telemetría está presente pero los valores se ven mal}
+\begin{itemize}
+    \item Revisa el escalado del sensor (divisores de voltaje, rango del ADC, unidades).
+    \item Reduce el ruido: acorta cables analógicos, agrega filtrado (filtro RC) y evita tender líneas analógicas junto a cables de motores.
+\end{itemize}
+
+\section{Dispositivos I2C No Detectados (MCP23017 o Sensores)}
+\label{sec:i2c}
+
+\begin{itemize}
+    \item Verifica que SDA esté en GPIO21 y SCL en GPIO22 (según \texttt{pins.h}).
+    \item Confirma que el dispositivo use lógica de 3.3V (o usa conversión de nivel).
+    \item Revisa resistencias pull-up en SDA/SCL (muchas placas incluyen; demasiadas pull-ups en paralelo también pueden causar problemas).
+    \item Confirma la dirección I2C (por defecto del MCP23017 en el repositorio es \texttt{0x20}).
+\end{itemize}
+
+\section{Consejos Generales de Depuración (Flujo Recomendado)}
+\label{sec:debugging-tips}
+
+\begin{enumerate}
+    \item \textbf{Empieza por el enlace:} verifica primero el emparejamiento Bluetooth y una conexión estable.
+    \item \textbf{Prueba salidas sin motores:} LEDs en pines PWM/de switch confirman que la ruta de control funciona.
+    \item \textbf{Agrega un subsistema a la vez:} motores, luego servos, luego sensores, luego expansión I2C.
+    \item \textbf{Usa logging:}
+    \begin{itemize}
+        \item ESP32: salida debug por serial (cuando está habilitada en el firmware).
+        \item Android: revisa los indicadores para confirmar el estado de conexión y la telemetría entrante.
+    \end{itemize}
+    \item \textbf{Trata la alimentación como un componente de primera clase:} la mayoría de fallos intermitentes provienen de subvoltaje o fuentes ruidosas.
+\end{enumerate}

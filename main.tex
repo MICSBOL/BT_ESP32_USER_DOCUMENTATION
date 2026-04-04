@@ -1,5 +1,7 @@
 \documentclass[a4paper,12pt]{report}
 
+
+\usepackage{ifthen}
 % --- Encoding & Fonts ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -7,7 +9,16 @@
 \usepackage{graphicx}
 % --- Language ---
 %\usepackage[english,spanish,es-noshorthands]{babel}
-\usepackage[english,spanish,es-noshorthands]{babel}
+%\usepackage[spanish,english]{babel}
+
+
+%\newcommand{\doclang}{spanish}   % or spanish, french, etc.
+%\usepackage[english, spanish]{babel}
+%\selectlanguage{spanish}
+
+\newcommand{\doclang}{english}   % or spanish, french, etc.
+\usepackage[english]{babel}
+\selectlanguage{english}
 
 % --- Page Layout ---
 \usepackage[a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
@@ -80,25 +91,28 @@
     bigground/.style={ground, scale=2.5}
 }
 
+
+
+
 % --- Document ---
 \begin{document}
-	\input{chapters/00_cover_page}
+	\input{chapters/\doclang/00_cover_page}
 	\tableofcontents
 	\newpage
-    \input{chapters/01_introduction}
-	\input{chapters/02_requirements}
-	\input{chapters/03_hardware_setup}
-	\input{chapters/04_firmware_upload}
-	\input{chapters/05_connecting_app}
-	\input{chapters/06_basic_controls}
-	\input{chapters/07_customizing_project}
-	\input{chapters/08_example_projects}
-	\input{chapters/09_wiring_diagrams}
-	\input{chapters/10_troubleshooting}
-	\input{chapters/11_advanced_features}
-	\input{chapters/12_practical_control_and_telemetry_examples}
-	\input{chapters/13_control_layer_and_hardware_abstraction}
-    \input{chapters/14_diagram_circuit}
+    \input{chapters/\doclang/01_introduction}
+	\input{chapters/\doclang/02_requirements}
+	\input{chapters/\doclang/03_hardware_setup}
+	\input{chapters/\doclang/04_firmware_upload}
+	\input{chapters/\doclang/05_connecting_app}
+	\input{chapters/\doclang/06_basic_controls}
+	\input{chapters/\doclang/07_customizing_project}
+	\input{chapters/\doclang/08_example_projects}
+	\input{chapters/\doclang/09_wiring_diagrams}
+	\input{chapters/\doclang/10_troubleshooting}
+	\input{chapters/\doclang/11_advanced_features}
+	\input{chapters/\doclang/12_practical_control_and_telemetry_examples}
+	\input{chapters/\doclang/13_control_layer_and_hardware_abstraction}
+    \input{chapters/\doclang/14_diagram_circuit}
 
 \end{document}
 

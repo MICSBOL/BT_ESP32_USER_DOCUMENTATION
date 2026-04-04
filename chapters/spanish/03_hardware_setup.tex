@@ -1,0 +1,123 @@
+\chapter{Configuración de Hardware}
+\label{ch:hardware-setup}
+
+Este capítulo describe la configuración de hardware recomendada para el firmware
+\textbf{MICSBOL/ESP32\_BT\_Controller}: el ESP32 recibe paquetes de control desde la aplicación Android a través de
+Bluetooth (SPP), acciona actuadores mediante la capa de abstracción de hardware (HAL) y, de forma opcional,
+puede leer entradas de sensores para telemetría.
+
+\section{Placa de Desarrollo ESP32}
+\label{sec:hw-esp32-board}
+
+El ESP32 actúa como el controlador principal. Después de cargar (flashear) el firmware y alimentar la placa,
+esta anuncia un dispositivo Bluetooth llamado \texttt{ESP32-BT}. Si Android solicita un PIN durante el emparejamiento,
+el PIN por defecto es \texttt{1234}. (Perfil Bluetooth: SPP.)\footnote{Consulta la guía de conexión en el
+    \texttt{README.md} del repositorio para el nombre exacto del dispositivo, el PIN por defecto y una referencia rápida.}
+
+Una configuración típica incluye:
+\begin{itemize}
+    \item una placa de desarrollo ESP32 con el firmware del repositorio cargado,
+    \item una alimentación estable de 5V (batería externa USB / cargador / o fuente regulada de 5V),
+    \item actuadores conectados (driver de motor, servos, LEDs/zumbador), y
+    \item sensores opcionales (analógicos o I\textsuperscript{2}C) para telemetría.
+\end{itemize}
+
+\paragraph{Modos del proyecto}
+El firmware admite diferentes enfoques de cableado según el modo seleccionado en \texttt{user\_config.h}:
+\begin{itemize}
+    \item \texttt{MODE\_FULL\_RC} (por defecto): utiliza los pines integrados del ESP32 para las salidas.
+    \item \texttt{MODE\_FULL\_RC\_MCP}: amplía las salidas digitales usando un expansor GPIO MCP23017.
+\end{itemize}
+
+\section{Salidas de Control (Lo que Controla la App)}
+\label{sec:hw-control-outputs}
+
+Una vez conectada, la aplicación Android proporciona canales de control que se mapean en la capa de control/HAL del firmware:
+\begin{itemize}
+    \item Stick izquierdo X: dirección (izquierda/derecha)
+    \item Stick izquierdo Y: velocidad del motor izquierdo
+    \item Stick derecho X: paneo de cámara (izquierda/derecha)
+    \item Stick derecho Y: velocidad del motor derecho
+    \item Perilla izquierda: brillo de LED (0 = apagado, máx. = máximo)
+    \item Perilla derecha: intensidad del zumbador (0 = silencio, máx. = máximo)
+    \item Interruptores 1--6: salidas digitales (encendido/apagado)
+    \item Botones de evento: envían un pulso corto a una salida tipo interruptor
+\end{itemize}
+
+Estas asignaciones se resumen en el \texttt{README.md} del repositorio y se implementan en el firmware en
+\texttt{control.cpp} y \texttt{hal\_output.cpp}.
+
+\section{Conexión del Driver de Motor}
+\label{sec:hw-motor-driver}
+
+Los motores DC \textbf{no} deben alimentarse directamente desde los pines del ESP32. Se requiere un driver de motor
+(por ejemplo, un módulo de doble puente H).
+
+Normalmente el driver necesita:
+\begin{itemize}
+    \item \textbf{Alimentación de motor (VM)}: voltaje de batería adecuado para los motores,
+    \item \textbf{Alimentación lógica (VCC)}: normalmente 3.3V o 5V según el módulo del driver,
+    \item \textbf{GND}: tierra común compartida con el ESP32, y
+    \item \textbf{Entradas de control}: PWM y dirección, controladas por GPIO del ESP32 (a través del HAL).
+\end{itemize}
+
+\paragraph{La tierra común es obligatoria}
+Si el driver de motor y el ESP32 no comparten una tierra común, las señales PWM y de dirección serán poco confiables
+y los motores pueden no responder.
+
+\section{Conexiones de Servos}
+\label{sec:hw-servos}
+
+Los servomotores pueden controlarse desde pines GPIO del ESP32 con capacidad PWM. El firmware trata algunos canales como
+salidas PWM que pueden asignarse a la dirección y al paneo de cámara.
+
+\paragraph{Alimentación del servo}
+Aunque la señal PWM proviene del ESP32, la mayoría de servos deben alimentarse desde una línea separada de 5V:
+\begin{itemize}
+    \item Servo \textbf{V+}: regulador externo de 5V (dimensionado para la corriente de bloqueo del servo)
+    \item Servo \textbf{GND}: compartido con GND del ESP32
+    \item Servo \textbf{Señal}: pin PWM del ESP32
+\end{itemize}
+
+\section{Entradas Opcionales y Sensores de Telemetría}
+\label{sec:hw-telemetry-inputs}
+
+El firmware puede enviar telemetría de vuelta a la app Android (paneles numéricos, indicadores y gráficas). El repositorio
+describe elementos de telemetría como paneles, indicadores (aceleración/batería) y gráficas (voltios/amperios/RPM). Los valores
+de telemetría pueden provenir de sensores reales (analógicos/I\textsuperscript{2}C) o pueden inyectarse para pruebas mediante los
+modos de depuración de telemetría en \texttt{debug\_config.h}.
+
+Interfaces típicas de sensores:
+\begin{itemize}
+    \item \textbf{Entradas analógicas (ADC)}: para monitor de batería, potenciómetros, sensores de temperatura, etc.
+    \item \textbf{I\textsuperscript{2}C}: para sensores externos o expansión de E/S (MCP23017 en modo MCP)
+\end{itemize}
+
+\section{Fuente de Alimentación y Seguridad}
+\label{sec:hw-power}
+
+Un sistema de alimentación confiable es esencial para una operación Bluetooth estable y un control correcto de motores/servos.
+
+\subsection{Esquema de alimentación recomendado}
+\begin{itemize}
+    \item \textbf{ESP32:} alimentado por USB de 5V o una línea regulada de 5V.
+    \item \textbf{Motores:} alimentados desde una batería/línea de motor a través del driver (VM).
+    \item \textbf{Servos (si se usan):} alimentados por un regulador separado de 5V capaz de entregar picos de corriente altos.
+\end{itemize}
+
+\subsection{Tierra (GND)}
+Conecta siempre todas las tierras en común:
+\begin{itemize}
+    \item GND del ESP32
+    \item GND del driver de motor
+    \item GND de la alimentación de servos
+    \item GND de los sensores
+\end{itemize}
+
+\subsection{Notas prácticas}
+\begin{itemize}
+    \item Mantén el cableado de potencia de motores físicamente separado del cableado de señales del ESP32 cuando sea posible.
+    \item Agrega capacitores de desacoplo cerca de drivers de motor / rieles de servos para reducir reinicios por caídas de tensión.
+    \item Si el ESP32 se reinicia cuando arrancan los motores, la causa suele ser caída de tensión o ruido: mejora el regulador,
+    añade capacitancia y verifica la topología del cableado de tierra.
+\end{itemize}

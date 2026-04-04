@@ -1,0 +1,53 @@
+% Portada para BT_ESP32_USER_DOCUMENTATION
+% Uso (en main.tex, después de \begin{document} y antes de \tableofcontents):
+    %   \input{chapters/00_cover_page_es}
+    %   \clearpage
+
+    \begin{titlepage}
+        \centering
+
+        \vspace*{1.2cm}
+
+        {\Huge\bfseries Sistema de Controlador RC por Bluetooth\par}
+        \vspace{0.3cm}
+        {\Large\bfseries Documentación de la App Android + Firmware ESP32\par}
+
+        \vspace{0.8cm}
+        {\large (EmitterApp + ESP32\_BT\_Controller)\par}
+
+        \vspace{1.2cm}
+        \rule{0.9\textwidth}{0.8pt}\par
+        \vspace{0.6cm}
+
+        {\large
+            Este documento explica cómo construir, cablear, configurar y depurar un sistema de
+            control remoto basado en Bluetooth utilizando una aplicación Android y un firmware
+            controlador en ESP32.
+            \par}
+
+        \vspace{0.9cm}
+
+        \begin{minipage}{0.9\textwidth}
+            \raggedright
+            \textbf{Temas incluidos}
+            \begin{itemize}
+                \item Carga del firmware y conexión Bluetooth
+                \item Controles básicos (joysticks, perillas, interruptores, botones)
+                \item Diagramas de cableado y asignación de pines (\texttt{pins.h})
+                \item Paneles, indicadores y gráficas de telemetría
+                \item Capa de control vs abstracción de hardware (\texttt{control.cpp}, \texttt{hal\_output.cpp})
+                \item Solución de problemas (Android y ESP32)
+            \end{itemize}
+        \end{minipage}
+
+        \vfill
+
+        \includegraphics[width=0.5\textwidth]{assets/mics_logo.pdf}
+
+        \begin{tabular}{@{}rl@{}}
+            %        \textbf{Repositorio:} & \texttt{MICSBOL/BT\_ESP32\_USER\_DOCUMENTATION} \\
+            \textbf{Fecha:} & \today \\
+        \end{tabular}
+
+        \vspace*{1.0cm}
+    \end{titlepage}

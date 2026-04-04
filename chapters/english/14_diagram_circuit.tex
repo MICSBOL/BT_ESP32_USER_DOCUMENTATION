@@ -1,35 +1,6 @@
 \chapter{Wiring Diagram Explained (Repository Reference)}
 \label{ch:wiring-diagram-explained}
 
-\section{Quick Summary}
-\label{sec:wiring-quick-summary}
-
-Figure~\ref{fig:full-rc-wiring} is a practical wiring reference for the \textbf{MICSBOL/ESP32\_BT\_Controller}
-project. It shows:
-
-\begin{itemize}
-    \item \textbf{Inputs (left side):}
-    \begin{itemize}
-        \item I2C bus (SDA/SCL) for sensors or expansion
-        \item Analog inputs (NUM1/NUM2/AIN1/AIN2) used as telemetry sources
-        \item Digital indicator inputs (IND1--IND4) used to build a status mask
-    \end{itemize}
-    \item \textbf{Outputs (right side):}
-    \begin{itemize}
-        \item PWM outputs for servos, motors, LED brightness and buzzer
-        \item Switch outputs (SW1--SW4 in direct mode, SW1--SW6 in MCP mode)
-        \item Pulse/event outputs used for momentary actions (button events)
-    \end{itemize}
-\end{itemize}
-
-\noindent In code terms:
-\begin{itemize}
-    \item \texttt{control.cpp} maps \texttt{rcStatePacket} fields to actions (steer, motors, pan, LED, buzzer, switches).
-    \item \texttt{hal\_output.cpp} performs the real hardware writes (PWM via \texttt{ledcWrite}, GPIO via \texttt{digitalWrite},
-    MCP outputs via \texttt{mcpWriteOutput}, pulses via \texttt{pulseStart}).
-    \item \texttt{input\_hw.cpp} reads ADC and indicator pins (used for telemetry sources).
-    \item \texttt{pins.h} defines the GPIO mapping (and it changes depending on the project mode).
-\end{itemize}
 
 \section{Diagram (Included)}
 \label{sec:wiring-diagram}
@@ -345,6 +316,18 @@ project. It shows:
 
 
 
+    \end{circuitikz}
+\caption{Suggested ESP32 pin assignment (part 1).}
+\label{fig:full-rc-wiring-a}
+\end{figure}
+
+\clearpage % forces next floats to appear after a page break
+
+% --- Figure 2: bottom part (your snippet) ---
+\begin{figure}[H]
+\centering
+\begin{circuitikz}[scale=0.6, transform shape, font=\large]
+
         % =====================================================
         % PWM MOTOR CONTROL (PWM KL 26)
         % =====================================================
@@ -504,6 +487,38 @@ project. It shows:
     \label{fig:full-rc-wiring}
 \end{figure}
 % -------------------- END FIGURE --------------------
+
+
+
+\section{Quick Summary}
+\label{sec:wiring-quick-summary}
+
+Figure~\ref{fig:full-rc-wiring} is a practical wiring reference for the \textbf{MICSBOL/ESP32\_BT\_Controller}
+project. It shows:
+
+\begin{itemize}
+    \item \textbf{Inputs (left side):}
+    \begin{itemize}
+        \item I2C bus (SDA/SCL) for sensors or expansion
+        \item Analog inputs (NUM1/NUM2/AIN1/AIN2) used as telemetry sources
+        \item Digital indicator inputs (IND1--IND4) used to build a status mask
+    \end{itemize}
+    \item \textbf{Outputs (right side):}
+    \begin{itemize}
+        \item PWM outputs for servos, motors, LED brightness and buzzer
+        \item Switch outputs (SW1--SW4 in direct mode, SW1--SW6 in MCP mode)
+        \item Pulse/event outputs used for momentary actions (button events)
+    \end{itemize}
+\end{itemize}
+
+\noindent In code terms:
+\begin{itemize}
+    \item \texttt{control.cpp} maps \texttt{rcStatePacket} fields to actions (steer, motors, pan, LED, buzzer, switches).
+    \item \texttt{hal\_output.cpp} performs the real hardware writes (PWM via \texttt{ledcWrite}, GPIO via \texttt{digitalWrite},
+    MCP outputs via \texttt{mcpWriteOutput}, pulses via \texttt{pulseStart}).
+    \item \texttt{input\_hw.cpp} reads ADC and indicator pins (used for telemetry sources).
+    \item \texttt{pins.h} defines the GPIO mapping (and it changes depending on the project mode).
+\end{itemize}
 
 \section{Straight Explanation of Each Group (What it does)}
 \label{sec:wiring-components}

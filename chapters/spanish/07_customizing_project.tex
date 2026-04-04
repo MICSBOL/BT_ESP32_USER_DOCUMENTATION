@@ -1,0 +1,193 @@
+\chapter{Personalización de tu Proyecto}
+
+Este capítulo explica la forma recomendada de ampliar el firmware en
+\texttt{MICSBOL/ESP32\_BT\_Controller}. El repositorio está organizado de manera que:
+
+\begin{itemize}
+    \item \textbf{El mapeo de pines está centralizado} en \texttt{pins.h} y depende del modo de compilación seleccionado
+    mediante \texttt{PROJECT\_MODE}.
+    \item \textbf{Las lecturas de hardware} (ADC/GPIO/I\textsuperscript{2}C) se recolectan en módulos dedicados como
+    \texttt{input\_hw.*} (lecturas ADC/digitales) y \texttt{i2c\_sensors.*}.
+    \item \textbf{Los paquetes de telemetría} se construyen y se transmiten en \texttt{telemetry.cpp}, pero los \emph{valores}
+    provienen de un módulo proveedor separado, \texttt{telemetry\_source.*}.
+    \item \textbf{La expansión opcional de GPIO} (MCP23017) se gestiona mediante \texttt{mcp\_io.*} y el mapeo dependiente
+    del modo en \texttt{pins.h}.
+\end{itemize}
+
+\section{Mapeo de Pines (pins.h) y Modos de Proyecto}
+
+El repositorio define dos modos de cableado en \texttt{pins.h}:
+
+\begin{itemize}
+    \item \textbf{Modo directo ESP32} (\texttt{PROJECT\_MODE == FULL\_RC\_MODE}): la mayoría de E/S usa pines GPIO del ESP32.
+    \item \textbf{Modo expansión MCP} (\texttt{PROJECT\_MODE == FULL\_RC\_MODE\_MCP}): la E/S digital se amplía usando un
+    MCP23017 por I\textsuperscript{2}C, mientras que las salidas PWM se mantienen en el ESP32.
+\end{itemize}
+
+\subsection{Bus I\textsuperscript{2}C (reservado / bus MCP)}
+En ambos modos, \texttt{pins.h} reserva el bus I\textsuperscript{2}C del ESP32 en:
+
+\begin{itemize}
+    \item \texttt{PIN\_I2C\_SDA = 21}
+    \item \texttt{PIN\_I2C\_SCL = 22}
+\end{itemize}
+
+En modo MCP, estos pines se usan para la comunicación ESP32 $\leftrightarrow$ MCP23017 (y también pueden compartirse con otros
+sensores I\textsuperscript{2}C si el bus está diseñado correctamente).
+
+\subsection{Salidas PWM (6 en total)}
+En ambos modos, \texttt{pins.h} define seis salidas PWM en el ESP32:
+
+\begin{itemize}
+    \item \texttt{PIN\_PWM\_STICK\_LX = 18}
+    \item \texttt{PIN\_PWM\_STICK\_LY = 19}
+    \item \texttt{PIN\_PWM\_STICK\_RX = 23}
+    \item \texttt{PIN\_PWM\_STICK\_RY = 25}
+    \item \texttt{PIN\_PWM\_KNOB\_L = 26}
+    \item \texttt{PIN\_PWM\_KNOB\_R = 27}
+\end{itemize}
+
+Estos canales suelen usarse para servos, entradas PWM de drivers de motor u otras salidas de tipo analógico.
+
+\subsection{Salidas de dirección de motor (2)}
+Ambos modos definen dos salidas de dirección pensadas para drivers de motor:
+
+\begin{itemize}
+    \item \texttt{PIN\_MD\_LEFT = 12} \quad (nota en el repositorio: \emph{mantener en LOW al arranque})
+    \item \texttt{PIN\_MD\_RIGHT = 15} \quad (nota en el repositorio: \emph{mantener en LOW al arranque})
+\end{itemize}
+
+\paragraph{Nota de seguridad al arranque}
+Los comentarios en \texttt{pins.h} advierten que estos pines deben mantenerse en LOW durante el arranque. Al personalizar,
+evita resistencias pull-up externas o circuitos que lleven estos pines a HIGH durante el reset.
+
+\subsection{Entradas analógicas (ADC1 seguras)}
+El repositorio usa explícitamente pines de ADC1 para entradas analógicas (recomendado cuando se usa Bluetooth).
+Sin embargo, los números de pin cambian según el modo:
+
+\paragraph{Modo directo ESP32 (\texttt{FULL\_RC\_MODE})}
+\begin{itemize}
+    \item \texttt{PIN\_NUMERIC1 = 34}
+    \item \texttt{PIN\_NUMERIC2 = 35}
+    \item \texttt{PIN\_ANALOG\_IND1 = 36}
+    \item \texttt{PIN\_ANALOG\_IND2 = 39}
+\end{itemize}
+
+\paragraph{Modo expansión MCP (\texttt{FULL\_RC\_MODE\_MCP})}
+\begin{itemize}
+    \item \texttt{PIN\_NUMERIC1 = 32}
+    \item \texttt{PIN\_NUMERIC2 = 33}
+    \item \texttt{PIN\_ANALOG\_IND1 = 34}
+    \item \texttt{PIN\_ANALOG\_IND2 = 35}
+\end{itemize}
+
+\paragraph{Implicación práctica}
+Si cambias de modo de proyecto, \textbf{debes} revisar de nuevo el cableado de los sensores analógicos, porque los pines ADC
+para numéricos/indicadores cambian entre modos.
+
+\subsection{Entradas digitales (indicadores) en modo directo}
+En modo directo ESP32, \texttt{pins.h} define cuatro entradas digitales para indicadores:
+
+\begin{itemize}
+    \item \texttt{PIN\_IND1 = 4}
+    \item \texttt{PIN\_IND2 = 5}
+    \item \texttt{PIN\_IND3 = 2}
+    \item \texttt{PIN\_IND4 = 0} \quad (nota del repositorio: \emph{cuidado: evitar pull-up al arranque})
+\end{itemize}
+
+\paragraph{Advertencia de arranque en GPIO0}
+Como \texttt{PIN\_IND4} usa GPIO0 en modo directo, evita un cableado que fuerce GPIO0 a HIGH/LOW durante el reset de una forma que
+ponga al ESP32 en un modo de arranque incorrecto.
+
+\subsection{Salidas de interruptores (modo directo)}
+En modo directo, el repositorio define salidas de interruptores en pines del ESP32:
+
+\begin{itemize}
+    \item \texttt{PIN\_SW1 = 16}
+    \item \texttt{PIN\_SW2 = 17}
+    \item \texttt{PIN\_SW3 = 13}
+    \item \texttt{PIN\_SW4 = 14}
+\end{itemize}
+
+\paragraph{Importante}
+En el estado actual de \texttt{pins.h}, solo se definen \texttt{PIN\_SW1} hasta \texttt{PIN\_SW4} en modo directo,
+aunque otras partes del sistema se refieren a ``Switches 1--6'' de forma conceptual. Si tu proyecto necesita SW5/SW6 en modo directo,
+debes asignar pines GPIO adicionales en \texttt{pins.h} y actualizar la capa de salidas en consecuencia.
+
+\subsection{Salidas de pulso (botones de evento Android)}
+Las salidas de pulso están pensadas para acciones momentáneas disparadas por botones de evento en Android.
+
+\paragraph{Modo directo ESP32}
+\begin{itemize}
+    \item \texttt{PIN\_PULSE1 = 32}
+    \item \texttt{PIN\_PULSE2 = 33}
+\end{itemize}
+
+\paragraph{Modo expansión MCP}
+En modo MCP, \texttt{pins.h} asigna cuatro salidas de pulso en GPIO del ESP32:
+
+\begin{itemize}
+    \item \texttt{PIN\_PULSE1 = 4}
+    \item \texttt{PIN\_PULSE2 = 5}
+    \item \texttt{PIN\_PULSE3 = 13}
+    \item \texttt{PIN\_PULSE4 = 14}
+\end{itemize}
+
+\section{Agregar Sensores (Fuentes de Telemetría)}
+
+La forma más limpia de agregar sensores es alimentar sus mediciones en los canales de telemetría existentes. El API del proveedor
+se declara en \texttt{telemetry\_source.h}:
+
+\begin{itemize}
+    \item \textbf{Paneles:} \verb|getPanelLeft()| y \verb|getPanelRight()| devuelven valores de 16 bits.
+    \item \textbf{Indicadores:} \verb|getIndicatorAnalog()|, \verb|getIndicatorBattery()| y
+    \verb|getIndicatorDigitalMask()| devuelven valores de 8 bits.
+    \item \textbf{Gráficas (plots):} \verb|getPlot1()|, \verb|getPlot2()| y \verb|getPlot3()| devuelven valores de 8 bits.
+\end{itemize}
+
+\subsection{Sensores analógicos}
+Flujo de trabajo típico:
+\begin{enumerate}
+    \item Elige un pin ADC desde la sección del modo correcto en \texttt{pins.h}.
+    \item Implementa el escalado/conversión en \texttt{input\_hw.cpp} (consulta funciones como \verb|hwReadPlot1()|,
+    \verb|hwReadIndicatorAnalog()|, etc., declaradas en \texttt{input\_hw.h}).
+    \item Devuelve el valor procesado en \texttt{telemetry\_source.cpp} mediante \verb|getPlotX()| / \verb|getIndicator...()|.
+\end{enumerate}
+
+\subsection{Sensores I\textsuperscript{2}C}
+El repositorio ofrece helpers I\textsuperscript{2}C en \texttt{i2c\_sensors.*} (por ejemplo, \verb|i2cReadTemp()| y
+\verb|i2cReadIMU(...)| en \texttt{i2c\_sensors.h}). Para agregar otro dispositivo:
+\begin{enumerate}
+    \item Conecta SDA/SCL a \texttt{PIN\_I2C\_SDA}/\texttt{PIN\_I2C\_SCL}.
+    \item Agrega una función de lectura en \texttt{i2c\_sensors.cpp/.h}.
+    \item Publica el valor a través de \texttt{telemetry\_source.cpp}.
+\end{enumerate}
+
+\section{Uso de MCP23017 (Expansión GPIO)}
+
+En modo MCP, \texttt{pins.h} documenta el mapeo digital previsto:
+
+\begin{itemize}
+    \item \textbf{GPA0--GPA7} $\rightarrow$ 8 indicadores digitales (ENTRADAS)
+    \item \textbf{GPB0--GPB5} $\rightarrow$ 6 salidas de interruptores
+    \item \textbf{GPB6--GPB7} $\rightarrow$ 2 salidas libres para que las uses
+\end{itemize}
+
+La interfaz del MCP en \texttt{mcp\_io.h} ofrece:
+
+\begin{itemize}
+    \item \verb|mcpInit()|
+    \item \verb|mcpReadDigitalInputs()| (lee el puerto A)
+    \item \verb|mcpWriteOutput(...)| y \verb|mcpWritePortB(...)| (escribe el puerto B)
+\end{itemize}
+
+\section{Lista Práctica al Personalizar}
+
+\begin{itemize}
+    \item \textbf{Comienza siempre revisando \texttt{pins.h} para el modo seleccionado}: los pines analógicos y de pulso cambian entre modos.
+    \item \textbf{Ten cuidado con pines sensibles al arranque}: GPIO0 y GPIO12/15 tienen advertencias explícitas relacionadas con el arranque en el repositorio.
+    \item \textbf{Si necesitas más E/S digital, prefiere el modo MCP}: amplía de forma limpia indicadores y salidas de interruptores mediante I\textsuperscript{2}C.
+    \item \textbf{Cambia una cosa a la vez}: actualiza el cableado, luego actualiza \texttt{pins.h}/funciones de lectura, y después prueba telemetría y salidas.
+    \item \textbf{Recomendación al flashear}: carga el firmware con el ESP32 \textbf{totalmente desconectado del hardware externo} (motores, servos, relés, sensores y especialmente cualquier cableado a pines de arranque/strapping). Esto evita fallos de carga por ruido eléctrico, caídas de tensión o por forzar niveles lógicos incorrectos en pines críticos durante el arranque.
+    \item \textbf{Si falla la carga}: primero desconecta todo lo externo, prueba con otro cable USB/u otro puerto, y si tu placa lo requiere mantén presionado el botón \textbf{BOOT} al iniciar la carga. Reconecta el hardware externo \textbf{solo después} de confirmar que el firmware arranca correctamente.
+\end{itemize}

@@ -1,0 +1,173 @@
+\chapter{Funciones Avanzadas}
+\label{ch:advanced-features}
+
+El firmware \textbf{ESP32\_BT\_Controller} está diseñado como una plataforma modular de RC + telemetría.
+Más allá del control básico por joysticks, incluye un protocolo de comunicación liviano, modos de proyecto
+configurables, un sistema de telemetría estructurado y expansión I2C opcional.
+
+Este capítulo destaca las funciones avanzadas más útiles y explica cómo funcionan en la práctica.
+
+\section{Resumen del Protocolo: Comandos, Eventos y Telemetría}
+\label{sec:protocol-overview}
+
+La comunicación se basa en paquetes (ver \texttt{packets.h}). El firmware usa:
+
+\begin{itemize}
+    \item \textbf{Paquetes RC State:} estado de control continuo (sticks, perillas, interruptores).
+    \item \textbf{Paquetes de Evento:} comandos cortos de una sola vez (pulsaciones de botones).
+    \item \textbf{Paquetes de Telemetría:} retroalimentación desde el ESP32 hacia la app Android (paneles, indicadores, gráficas y etiquetas de configuración).
+\end{itemize}
+
+Todos los paquetes usan:
+\begin{itemize}
+    \item Encabezados fijos (p.\ ej., \texttt{0xCC} seguido por un byte de tipo de paquete)
+    \item Estructuras empaquetadas para un parseo predecible
+    \item Un checksum aditivo simple (liviano y rápido para sistemas embebidos)
+\end{itemize}
+
+\section{Sistema de Telemetría (Paneles, Indicadores, Gráficas)}
+\label{sec:telemetry}
+
+La telemetría es una de las partes más potentes de este firmware. Permite que el ESP32 envíe
+valores en tiempo real de vuelta a la app Android para que el operador pueda \emph{ver lo que el robot está haciendo}
+mientras lo conduce.
+
+\subsection{Categorías de telemetría}
+El firmware genera múltiples flujos de telemetría (implementados en \texttt{telemetry.cpp}):
+
+\begin{itemize}
+    \item \textbf{Paneles} (valores numéricos izquierda/derecha): lecturas compactas como distancia, velocidad, temperatura o cualquier número derivado de un sensor.
+    \item \textbf{Indicadores}: un conjunto pequeño de ``widgets de estado'' que incluye:
+    \begin{itemize}
+        \item un valor analógico (0--100)
+        \item un nivel de batería (0--100)
+        \item una máscara digital (campo de bits) para múltiples indicadores on/off
+    \end{itemize}
+    \item \textbf{Gráficas (plots)}: series de actualización rápida para gráficos en el tiempo (las etiquetas por defecto incluyen \texttt{Volts}, \texttt{Amps} y \texttt{RPMs}).
+\end{itemize}
+
+\subsection{Frecuencias de actualización de telemetría (significado práctico)}
+La telemetría se envía de forma periódica (constantes de tiempo en \texttt{telemetry.cpp}):
+
+\begin{itemize}
+    \item \textbf{Gráficas (plots):} cada 50 ms (\(\approx 20\,Hz\)) --- gráficos suaves para señales que cambian rápido.
+    \item \textbf{Indicadores:} cada 500 ms (\(\approx 2\,Hz\)) --- valores de UI estables para batería/estado.
+\end{itemize}
+
+\subsection{Handshake automático de configuración (etiquetas)}
+Cuando el teléfono se conecta, el ESP32 envía un \textbf{paquete de telemetría de configuración una vez por conexión}
+(\texttt{sendConfigTelemetry()}). Este paquete proporciona a la app etiquetas legibles para:
+
+\begin{itemize}
+    \item nombres de series de gráficas (p.\ ej., \texttt{Volts}, \texttt{Amps}, \texttt{RPMs})
+    \item nombres de paneles (p.\ ej., \texttt{Left}, \texttt{Right})
+    \item nombres de indicadores (p.\ ej., \texttt{Throttle}, \texttt{Battery})
+\end{itemize}
+
+Esta es una característica importante de usabilidad: la app Android puede poblar las etiquetas automáticamente sin
+codificarlas de forma fija para cada construcción de robot.
+
+\subsection{Ventana de reenvío de panel (característica de robustez)}
+Los valores de panel usan un pequeño mecanismo de reenvío (``ventana de reintento'') de modo que cuando una lectura de panel cambia,
+se retransmite repetidamente por un periodo corto (ver \texttt{resendWindow} y \texttt{resendInterval} en
+\texttt{telemetry.cpp}). Esto mejora la probabilidad de que el teléfono reciba la lectura actualizada incluso si se pierde un paquete.
+
+\section{Fuentes de Telemetría e Inyección de Debug}
+\label{sec:telemetry-sources}
+
+La telemetría está dividida intencionalmente en dos capas:
+
+\begin{itemize}
+    \item \textbf{\texttt{telemetry.cpp}} es \emph{solo escritura}: construye paquetes y los envía.
+    \item \textbf{\texttt{telemetry\_source.cpp}} decide \emph{de dónde vienen los datos}: lecturas de hardware o valores de depuración.
+\end{itemize}
+
+En operación normal, los valores de panel/indicador/gráfica se leen desde el hardware mediante funciones de
+\texttt{input\_hw.h} (p.\ ej., entradas numéricas y lecturas ADC). En modos debug, los valores pueden inyectarse por serial
+escribiendo valores simples separados por comas. Esto permite verificar el comportamiento de la UI Android y la decodificación
+de paquetes \emph{sin} sensores reales conectados.
+
+\paragraph{Por qué esto importa:}
+Puedes desarrollar primero la UI + pantallas de telemetría y luego integrar el hardware, reduciendo el tiempo de iteración.
+
+\section{Modos de Proyecto: Solo ESP32 vs Expansión MCP23017}
+\label{sec:project-modes}
+
+El firmware puede compilarse en diferentes modos de proyecto (configurados en \texttt{user\_config.h}):
+
+\begin{itemize}
+    \item \texttt{MODE\_FULL\_RC}: control RC completo usando GPIO del ESP32 directamente.
+    \item \texttt{MODE\_FULL\_RC\_MCP}: control RC completo usando un MCP23017 por I2C para E/S digital expandida.
+\end{itemize}
+
+Seleccionar el modo correcto es una ``función avanzada'' porque permite que una sola base de código escale desde robots pequeños
+hasta construcciones más grandes con muchos interruptores e indicadores.
+
+\section{Uso del Expansor GPIO MCP23017 (I2C)}
+\label{sec:mcp23017}
+
+El MCP23017 agrega 16 pines de E/S digital por I2C y es compatible con el firmware (\texttt{mcp\_io.cpp/.h}).
+
+\subsection{Detalles clave (desde la implementación)}
+\begin{itemize}
+    \item \textbf{Dirección I2C:} \texttt{0x20}
+    \item \textbf{Puerto A (GPIOA):} configurado como \textbf{INPUT} (usado para leer indicadores digitales)
+    \item \textbf{Puerto B (GPIOB):} configurado como \textbf{OUTPUT} (usado para salidas de interruptores y eventos)
+    \item Las salidas se rastrean por software (\texttt{portBState}) para que los pines individuales puedan alternarse de forma confiable.
+\end{itemize}
+
+\subsection{Aplicaciones prácticas}
+\begin{itemize}
+    \item Una caja de control con muchos interruptores (armar, luces, modos, accesorios)
+    \item Un robot con muchas entradas de estado (finales de carrera, líneas de falla, sensores de parachoques)
+    \item Arreglos complejos de indicadores LED (sin consumir GPIO del ESP32)
+\end{itemize}
+
+\section{Soporte de Sensores I2C (Ejemplos Incluidos)}
+\label{sec:i2c-sensors}
+
+El repositorio incluye ejemplos de lectura de sensores I2C en \texttt{i2c\_sensors.cpp}:
+
+\begin{itemize}
+    \item Un sensor de temperatura en la dirección \texttt{0x48}
+    \item Un ejemplo de IMU en la dirección \texttt{0x68} (lecturas de acelerómetro, p.\ ej., registros estilo MPU6050)
+\end{itemize}
+
+Estos ejemplos actúan como plantillas: puedes agregar pasos de inicialización y registros adicionales para soportar
+tu módulo de sensor exacto.
+
+\section{Diseño de Entrada Analógica para Compatibilidad con Bluetooth}
+\label{sec:adc1}
+
+Una elección de diseño avanzada, sutil pero importante, es el uso de entradas \textbf{solo ADC1} para lecturas analógicas
+en la configuración de pines por defecto. En ESP32, ADC2 suele ser problemático cuando Wi-Fi/Bluetooth está activo,
+por lo que el mapeo del repositorio mantiene la telemetría analógica en pines con capacidad ADC1 (ver \texttt{pins.h}).
+
+\paragraph{Implicación práctica:}
+Si agregas sensores analógicos, prefiere los pines ADC1 configurados (u otros canales ADC1) para evitar lecturas intermitentes
+o inválidas mientras Bluetooth está conectado.
+
+\section{Feature Flags (Firmware Modular en Tiempo de Compilación)}
+\label{sec:feature-flags}
+
+Las banderas de características en tiempo de compilación se definen en \texttt{feature\_config.h}. Controlan si los subsistemas
+se compilan/habilitan (salidas PWM, salidas de interruptores, salidas de eventos, telemetría, funciones de sensores I2C, etc.).
+
+\paragraph{Nota:}
+En el snapshot actual del repositorio, \texttt{USE\_TELEMETRY} y \texttt{USE\_I2C\_SENSOR} se definen como
+\texttt{0} en ambos modos de proyecto, aunque el código de implementación de telemetría existe en el repositorio. Esto sugiere que la telemetría
+puede habilitarse/deshabilitarse por configuración según las necesidades del proyecto (p.\ ej., para reducir ancho de banda o uso de CPU).
+
+\section{Uniendo Todo: Ejemplo de ``Construcción Avanzada''}
+\label{sec:advanced-build-example}
+
+Un proyecto avanzado realista combina estas características:
+
+\begin{itemize}
+    \item \textbf{Control RC:} dos sticks + perillas para conducción y control de cámara/brazo
+    \item \textbf{MCP23017:} muchos interruptores e indicadores usando expansión por I2C
+    \item \textbf{Telemetría:} gráficas de batería + corriente, además de paneles para temperatura y distancia
+\end{itemize}
+
+Esto crea una experiencia robusta para el operador: el control se mantiene responsivo, mientras que la telemetría ofrece
+conciencia situacional y alerta temprana de caída de batería, atascos de motor o fallas de sensores.

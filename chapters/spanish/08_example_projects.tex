@@ -1,0 +1,153 @@
+\chapter{Proyectos de Ejemplo}
+\label{ch:example-projects}
+
+Este capítulo presenta proyectos de ejemplo prácticos y de la vida real que combinan las dos partes del sistema:
+
+\begin{itemize}
+    \item \textbf{EmitterApp (Android)}: proporciona la interfaz del operador (dos joysticks, interruptores, perillas, botones de evento) además de widgets de telemetría en vivo (paneles, indicadores LED, indicadores analógicos/de batería y gráficas).
+    \item \textbf{ESP32\_BT\_Controller (ESP32, C/C++)}: se ejecuta en el hardware del robot/controlador, recibe comandos RC por Bluetooth (SPP) y envía configuración + telemetría de vuelta a la aplicación.
+\end{itemize}
+
+El objetivo de cada ejemplo es mostrar (1) cómo se mapean los controles al hardware real y (2) qué telemetría es útil durante la operación.
+
+\section{Auto RC (Tracción Diferencial)}
+\label{sec:example-rc-car}
+
+Una construcción común en el mundo real es un pequeño auto/rover RC de \textbf{tracción diferencial de dos ruedas} (dos motores DC + driver de motor). Este es el proyecto más simple que se beneficia de inmediato de la interfaz de dos sticks.
+
+\subsection*{Hardware típico}
+\begin{itemize}
+    \item Placa de desarrollo ESP32
+    \item Driver de motor de doble puente H (p.\ ej., TB6612FNG, DRV8833, L298N)
+    \item 2 motores DC + chasis + batería
+    \item Opcional: sensor de voltaje de batería (divisor resistivo al ADC)
+\end{itemize}
+
+\subsection*{Mapeo de controles (práctico)}
+\begin{itemize}
+    \item \textbf{Stick izquierdo Y}: aceleración (adelante/atrás).
+    \item \textbf{Stick izquierdo X}: dirección (girar izquierda/derecha) \emph{o} “mezcla arcade” (aceleración + dirección combinadas en velocidades de motor izquierdo/derecho).
+    \item \textbf{Switch 1}: armar/desarmar motores (seguridad).
+    \item \textbf{Perilla}: limitador de velocidad máxima (útil para manejo en interiores o entrenamiento).
+    \item \textbf{Botón de evento}: pulso de bocina/zumbador (retroalimentación audible corta).
+\end{itemize}
+
+\subsection*{Telemetría que importa en la vida real}
+\begin{itemize}
+    \item \textbf{Indicador de batería}: evita sobredescargar el paquete.
+    \item \textbf{Paneles}: muestran el comando de motor izquierdo/derecho o la velocidad de rueda medida (si hay encoders).
+    \item \textbf{Gráfica}: voltaje de batería a lo largo del tiempo (la caída bajo carga muestra cuándo estás cerca de agotarla).
+\end{itemize}
+
+\subsection*{Caso de uso real}
+Práctica de navegación en interiores, laboratorios básicos de enseñanza de robótica o un auto de demostración para taller donde los operadores pueden \textit{sentir} la diferencia entre modos de control (spring vs hold) mientras observan los efectos de batería y carga en la gráfica.
+
+\section{Plataforma de Control de Cámara (Cabezal Pan/Tilt)}
+\label{sec:example-camera-platform}
+
+Una plataforma pan/tilt es un proyecto realista usado para inspección, transmisión o experimentos de visión en robótica. También es un buen ejemplo de mezclar \textbf{control continuo} y \textbf{ajuste fino}.
+
+\subsection*{Hardware típico}
+\begin{itemize}
+    \item Placa de desarrollo ESP32
+    \item 2 servos (pan + tilt) o un gimbal pequeño
+    \item Cámara (cámara de acción, cámara FPV pequeña, soporte para teléfono, etc.)
+    \item Opcional: luz LED para iluminación
+\end{itemize}
+
+\subsection*{Mapeo de controles (práctico)}
+\begin{itemize}
+    \item \textbf{Stick derecho X}: pan de cámara.
+    \item \textbf{Stick derecho Y}: tilt de cámara.
+    \item \textbf{Perilla}: velocidad/suavizado del servo (movimiento cinematográfico lento vs seguimiento rápido).
+    \item \textbf{Switch}: alternar luz LED (encendido/apagado).
+    \item \textbf{Botón de evento}: acción “centrar cámara” (envía un evento corto para reiniciar ángulos).
+\end{itemize}
+
+\subsection*{Telemetría que importa en la vida real}
+\begin{itemize}
+    \item \textbf{Indicador analógico}: ángulo actual de pan o “ángulo objetivo de pan”.
+    \item \textbf{Panel}: ángulo de tilt o un modo con nombre (p.\ ej., \textit{TRACK} vs \textit{LOCK}).
+    \item \textbf{Indicadores LED}: muestran si la plataforma está centrada, siguiendo o en estado de advertencia.
+\end{itemize}
+
+\subsection*{Caso de uso real}
+Inspección en el hogar (mirar debajo de muebles, techos), ajuste de visión en robótica (apuntar la cámara mientras se ajusta la iluminación), o una demostración en vivo en un taller donde una persona conduce y otra controla la cámara.
+
+\section{Rover con Sensores (Construcción “Telemetry-First”)}
+\label{sec:example-sensor-rover}
+
+Un rover con sensores enfatiza la \textbf{medición y la retroalimentación} más que la velocidad. El ESP32 lee sensores y transmite telemetría al dispositivo Android, donde el operador ve paneles y gráficas de series temporales.
+
+\subsection*{Hardware típico}
+\begin{itemize}
+    \item Placa de desarrollo ESP32
+    \item Sensor de distancia (ultrasónico o ToF)
+    \item Sensor ambiental (temperatura/humedad/presión) por I2C
+    \item Opcional: expansor GPIO I2C MCP23017 (si necesitas más E/S)
+    \item Chasis de rover (2WD o 4WD)
+\end{itemize}
+
+\subsection*{Mapeo de controles (práctico)}
+\begin{itemize}
+    \item \textbf{Stick izquierdo}: conducción lenta (precisión).
+    \item \textbf{Switches}: alternar modos de sensores (p.\ ej., muestreo rápido/lento, registro on/off).
+    \item \textbf{Perilla}: tasa de muestreo o umbral de alerta (p.\ ej., límite de advertencia de distancia).
+\end{itemize}
+
+\subsection*{Telemetría que importa en la vida real}
+\begin{itemize}
+    \item \textbf{Panel izquierdo}: distancia (cm) al obstáculo.
+    \item \textbf{Panel derecho}: temperatura (\(^\circ\)C) o humedad (\%).
+    \item \textbf{Gráficas}: tendencias de distancia y/o voltaje (útiles para diagnosticar ruido, pérdidas de lectura del sensor o problemas de alimentación).
+    \item \textbf{Indicador de batería}: crítico para experimentos largos.
+\end{itemize}
+
+\subsection*{Caso de uso real}
+Mapeo ambiental (mover el rover por una habitación para ver gradientes de temperatura), experimentos de distancia a obstáculos para prototipos de conducción autónoma o demostraciones de operación basada en telemetría donde la gráfica revela lo que ocurre incluso cuando el robot está fuera de la vista.
+
+\section{Plataforma Robótica Personalizada (Modular, Expandible)}
+\label{sec:example-custom-robot}
+
+Un proyecto más avanzado del mundo real es un \textbf{robot modular} que combina locomoción, actuadores y múltiples dispositivos accesorios. Aquí es donde usar ambos repositorios juntos se vuelve especialmente valioso: el lado Android ofrece una interfaz rica para el operador, y el lado ESP32 puede adaptarse (mapeo de pines, modos, expansión I2C, fuentes de telemetría).
+
+\subsection*{Hardware típico}
+\begin{itemize}
+    \item Base de tracción (orugas o ruedas)
+    \item Actuador (brazo con servo, actuador lineal, pinza)
+    \item Luces + zumbador para retroalimentación
+    \item Varios sensores (monitoreo de batería, encoders, distancia, IMU)
+    \item Opcional: MCP23017 para switches/salidas adicionales
+\end{itemize}
+
+\subsection*{Ejemplo de mapeo de controles (práctico)}
+\begin{itemize}
+    \item \textbf{Stick izquierdo}: conducción.
+    \item \textbf{Stick derecho}: control del brazo (rotación + elevación) \emph{o} control de cámara.
+    \item \textbf{Switches}: modos (habilitar brazo, modo precisión, luces).
+    \item \textbf{Perillas}: ajuste fino (límite de velocidad, fuerza de agarre, trim del servo).
+    \item \textbf{Botones de evento}: acciones discretas (abrir/cerrar pinza, reiniciar orientación, paro de emergencia).
+\end{itemize}
+
+\subsection*{Telemetría que importa en la vida real}
+\begin{itemize}
+    \item \textbf{Widget de batería}: seguridad del operador (detenerse antes de brownouts).
+    \item \textbf{Paneles}: señales con nombre como \textit{ARM CURR}, \textit{IMU YAW}, \textit{GRIP STATE}.
+    \item \textbf{LEDs}: estado rápido (armado, advertencia, falla, enlace ok).
+    \item \textbf{Gráfica}: una o más señales a lo largo del tiempo (p.\ ej., consumo de corriente vs comando de motor para detectar atascos).
+\end{itemize}
+
+\subsection*{Caso de uso real}
+Proyectos maker y clubes de robótica: una plataforma base puede reutilizarse para diferentes eventos (sumo bot, robot de inspección, demostración de divulgación) cambiando la configuración del firmware (pines/funciones) y reutilizando la misma pantalla de control Android.
+
+\section{Lista de Verificación para Planificación del Proyecto (Recomendada)}
+\label{sec:planning-checklist}
+
+Antes de construir, decide:
+
+\begin{itemize}
+    \item \textbf{Controles}: qué debe hacer cada eje del joystick, switch, perilla y botón.
+    \item \textbf{Seguridad}: se recomienda fuertemente un switch de armar/desarmar y un evento de paro de emergencia.
+    \item \textbf{Telemetría}: elige 2--4 valores clave que hagan la operación más segura (batería, distancia, corriente de motor, temperatura).
+    \item \textbf{Expansión}: si necesitas dispositivos I2C (sensores, MCP23017) para escalar E/S.
+\end{itemize}

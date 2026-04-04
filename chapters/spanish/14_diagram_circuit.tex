@@ -1,0 +1,564 @@
+\chapter{Diagrama de Cableado Explicado (Referencia del Repositorio)}
+\label{ch:wiring-diagram-explained}
+
+\section{Diagrama (Incluido)}
+\label{sec:wiring-diagram}
+
+% -------------------- FIGURA TAL COMO SE PROPORCIONÓ --------------------
+\begin{figure}[H]
+    \centering
+    \begin{circuitikz}[scale=0.6, transform shape, font=\large]
+        \ctikzset{
+            label distance=-0pt,
+            every label/.style={font=\scriptsize}
+        }
+        % =====================================================
+        % BLOQUE ESP32
+        % =====================================================
+
+        \node[draw, minimum width=3cm, minimum height=12.5cm] (esp) at (-3,0) {ESP32};
+
+        % =====================================================
+        % LADO IZQUIERDO (ENTRADAS)
+        % =====================================================
+
+        % I2C
+        \node[left=0.7cm of esp.north west, yshift=-4.8cm] (i2c_sda) {SDA (21)};
+        \node[left=0.7cm of esp.north west, yshift=-5.8cm] (i2c_scl) {SCL (22)};
+
+        % Entradas analógicas
+        \node[left=2.25cm of esp.center, yshift=5.5cm] (num1) {NUM1 (32)};
+        \node[left=2.25cm of esp.center, yshift=4.5cm] (num2) {NUM2 (33)};
+        \node[left=2.25cm of esp.center, yshift=3.5cm] (ain1) {AIN1 (34)};
+        \node[left=2.25cm of esp.center, yshift=2.5cm] (ain2) {AIN2 (35)};
+
+        % Líneas de conexión con círculos abiertos más grandes
+        \draw (num1) -- ++(-2,0) node[ocirc, scale=3.6]{};
+        \draw (num2) -- ++(-2,0) node[ocirc, scale=3.6]{};
+        \draw (ain1) -- ++(-2.1,0) node[ocirc, scale=3.6]{};
+        \draw (ain2) -- ++(-2.1,0) node[ocirc, scale=3.6]{};
+
+        % Indicadores
+        \node[left=1cm of esp.south west, yshift=4cm] (ind1) {IND1 (4)};
+        \node[left=1cm of esp.south west, yshift=3cm] (ind2) {IND2 (5)};
+        \node[left=1cm of esp.south west, yshift=2cm] (ind3) {IND3 (2)};
+        \node[left=1cm of esp.south west, yshift=1cm] (ind4) {IND4 (0)};
+
+        % =====================================================
+        % LADO DERECHO (SALIDAS)
+        % =====================================================
+
+        % Salidas PWM
+        \node[right=0.5cm of esp.north east, yshift=-0.8cm] (pwm1) {PWM LX (18)};
+        \node[right=0.5cm of esp.north east, yshift=-1.8cm] (pwm2) {PWM LY (19)};
+        \node[right=0.5cm of esp.north east, yshift=-2.8cm] (pwm3) {PWM RX (23)};
+        \node[right=0.5cm of esp.north east, yshift=-3.8cm] (pwm4) {PWM RY (25)};
+        \node[right=0.5cm of esp.north east, yshift=-4.8cm] (pwm5) {PWM KL (26)};
+        \node[right=0.5cm of esp.north east, yshift=-5.8cm] (pwm6) {PWM KR (27)};
+
+        % Entradas de switches
+        \node[right=2cm of esp.center, yshift=-1.4cm] (sw1) {SW1 (16)};
+        \node[right=2cm of esp.center, yshift=-2.4cm] (sw2) {SW2 (17)};
+        \node[right=2cm of esp.center, yshift=-3.4cm] (sw3) {SW3 (13)};
+        \node[right=2cm of esp.center, yshift=-4.4cm] (sw4) {SW4 (14)};
+        \node[right=2cm of esp.center, yshift=-5.4cm] (sw5) {SW5 (12)};
+        \node[right=2cm of esp.center, yshift=-6.4cm] (sw6) {SW6 (15)};
+
+
+
+        % =====================================================
+        % SENSOR I2C
+        % =====================================================
+
+        \node[draw, minimum width=1.5cm, minimum height=0.8cm] (sensor) at (-14,2) {I2C};
+
+        \draw (sensor.east) -- ++(0.3,0) |- (i2c_sda);
+        \draw (sensor.east) -- ++(0.3,0) |- (i2c_scl);
+
+        % Puntos de inicio de pull-up
+        \coordinate (sda_r) at ($(i2c_sda)+(-3,0)$);
+        \coordinate (scl_r) at ($(i2c_scl)+(-5,0)$);
+
+        % Resistencias
+        \draw (sda_r) to[R,l={\scriptsize $4.7k\Omega$}, label distance=-1pt] ++(0,1.5) coordinate (vbus1);
+        \draw (scl_r) to[R,l={\scriptsize $4.7k\Omega$}, label distance=-1pt] ++(0,2.5) coordinate (vbus2);
+
+        % Unir riel Vcc
+        \draw (vbus1) -- ++(0,0.5) coordinate (vccbus);
+        \draw (vbus2) |- (vccbus);
+
+        % Nodo Vcc
+        \draw (vccbus) -- ++(0,0.6) node[VCC33]{\scriptsize 3.3V};
+
+        % =====================================================
+        % MONITOR DE VOLTAJE DE BATERÍA (ENTRADA ADC)
+        % =====================================================
+
+        % Referencia local para el circuito
+        \coordinate (batbase) at ($(ain1)+(9,-14)$);
+
+        % Resistencia superior
+        \draw ($(batbase)+(0,1.5)$)
+        to[R,l_=\scriptsize $100k$]
+        (batbase);
+
+        % Resistencia inferior
+        \draw (batbase)
+        to[R,l_=\scriptsize $33k$]
+        ($(batbase)+(0,-1.5)$);
+
+        % Positivo de la batería
+        \draw ($(batbase)+(0,1.5)$) -- ++(0,1) node[battery1]{};
+
+        % Etiqueta VBAT
+        \node[left] at ($(batbase)+(0,2.5)$) {\scriptsize VBAT};
+
+        % Negativo de batería a tierra
+        \draw ($(batbase)+(0,-1.5)$) -- ++(0,-1) node[bigground]{};
+
+        % Terminal de conexión ADC
+        \draw (batbase) -- ++(2,0)
+        node[ocirc, scale=3.6, label=right:{AIN2}]{};
+
+        % =====================================================
+        % SENSOR DE TEMPERATURA LM35 (AIN2)
+        % =====================================================
+
+        % Referencia local para el bloque LM35
+        \coordinate (lm35base) at ($(ain2)+(3.5,-12)$);
+
+        % Cuerpo del sensor
+        \node[draw, minimum width=1.8cm, minimum height=1.2cm] (lm35) at (lm35base) {LM35};
+
+        % Pin VCC
+        \draw (lm35.north) -- ++(0,0.8) node[VCC33]{3.3V};
+
+        % Pin GND
+        \draw (lm35.south) -- ++(0,-0.8) node[bigground]{};
+
+        % Pin de salida al terminal del ESP32
+        \draw (lm35.east) -- ++(1.5,0)
+        node[ocirc, scale=3.6, label=right:{AIN1}]{};
+
+        % =====================================================
+        % ENTRADA DE SENSOR LDR (NUM2)
+        % =====================================================
+
+        \coordinate (ldrbase) at ($(num2)+(-7,-14)$);
+
+        \begin{scope}[yshift=-7cm]
+
+            % LDR (parte superior)
+            \draw ($(ldrbase)+(0,2.5)$)
+            to[photoresistor,l_=\normalsize LDR]
+            (ldrbase);
+
+            % Resistencia fija
+            \draw (ldrbase)
+            to[R,l_=\normalsize $10k$]
+            ($(ldrbase)+(0,-1.5)$);
+
+            % VCC
+            \draw ($(ldrbase)+(0,1.5)$) -- ++(0,1) node[VCC33]{3.3V};
+
+            % GND
+            \draw ($(ldrbase)+(0,-1.5)$) -- ++(0,-1) node[bigground]{};
+
+            % Terminal de conexión
+            \draw (ldrbase) -- ++(2,0)
+            node[ocirc, scale=3.6, label=right:{NUM2}]{};
+
+        \end{scope}
+        % =====================================================
+        % ENTRADA DE POTENCIÓMETRO (NUM1)
+        % =====================================================
+
+        % Referencia local para el bloque del potenciómetro
+        \coordinate (potbase) at ($(num1)+(-2,-15.5)$);
+
+        % Potenciómetro vertical
+        \draw ($(potbase)+(0,1.5)$)
+        to[pR,l_=\scriptsize $10k$, invert]
+        ($(potbase)+(0,-1.5)$);
+
+        % Terminal superior a VCC
+        \draw ($(potbase)+(0,0.5)$) -- ++(0,1) node[VCC33]{3.3V};
+
+        % Terminal inferior a GND
+        \draw ($(potbase)+(0,-0.5)$) -- ++(0,-1) node[bigground]{};
+
+        % Línea horizontal de la flecha del cursor al terminal de conexión
+        \draw (potbase) -- ++(2,0)
+        node[ocirc, scale=3.6, label=right:{NUM1}]{};
+
+
+
+        % =====================================================
+        % SALIDAS LED (BUS DE TIERRA COMÚN)
+        % =====================================================
+
+        % Bus de tierra
+        \draw (5.8,-3) -- (7,-3) node[bigground]{};
+
+        % Circuitos LED
+        \draw (sw1) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led1) -- ++(0,-1);
+
+        \draw (sw2) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led2) -- ++(0,-1);
+
+        \draw (sw3) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led3) -- ++(0,-1);
+
+        \draw (sw4) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led4) -- ++(0,-1);
+
+        \draw (sw5) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led5) -- ++(0,-1);
+
+        \draw (sw6) to[R,l^=$330\Omega$, label distance=-3pt] ++(4.5,0)
+        to[led] ++(1.2,0) coordinate (led6) -- ++(0,0);
+
+
+
+        % =====================================================
+        % ENTRADAS DE SWITCH (CON PULL-UP Y BUS COMÚN VCC)
+        % =====================================================
+
+        % -------- BUS VCC ----------
+        \draw (-7.78,-0.29) -- (-14.5,-0.29) node[VCC33]{3.3V};
+
+        % -----------------------------------------------------
+        % IND1
+        % -----------------------------------------------------
+        \coordinate (ind1b) at ($(ind1)+(-1.2,0)$);
+        \draw (ind1) -- (ind1b);
+
+        \draw (ind1b) -- ++(0,0.0)
+        to[R,l=$10k\Omega$] ++(0,2)
+        coordinate (ind1r);
+
+        \coordinate (sw1) at ($(ind1b)+(-1.5,0)$);
+        \draw (sw1) node[bigground, line width=0.1pt]{}
+        to[push button,l=\small BTN1] (ind1b);
+
+
+        % -----------------------------------------------------
+        % IND2
+        % -----------------------------------------------------
+        \coordinate (ind2b) at ($(ind2)+(-3.0,0)$);
+        \draw (ind2) -- (ind2b);
+
+        \draw (ind2b) -- ++(0,0.7)
+        to[R,l=$10k\Omega$] ++(0,2.3)
+        coordinate (ind2r);
+
+        \coordinate (sw2) at ($(ind2b)+(-1.5,0)$);
+        \draw (sw2) node[bigground, line width=0.1pt]{}
+        to[push button,l=\small BTN2] (ind2b);
+
+
+        % -----------------------------------------------------
+        % IND3
+        % -----------------------------------------------------
+        \coordinate (ind3b) at ($(ind3)+(-4.8,0)$);
+        \draw (ind3) -- (ind3b);
+
+        \draw (ind3b) -- ++(0,1.4)
+        to[R,l=$10k\Omega$] ++(0,2.55)
+        coordinate (ind3r);
+
+        \coordinate (sw3) at ($(ind3b)+(-1.5,0)$);
+        \draw (sw3) node[bigground, line width=0.1pt]{}
+        to[push button,l=\small BTN3] (ind3b);
+
+
+        % -----------------------------------------------------
+        % IND4
+        % -----------------------------------------------------
+        \coordinate (ind4b) at ($(ind4)+(-6.6,0)$);
+        \draw (ind4) -- (ind4b);
+
+        \draw (ind4b) -- ++(0,2.1)
+        to[R,l=$10k\Omega$] ++(0,2.9)
+        coordinate (ind4r);
+
+        \coordinate (sw4) at ($(ind4b)+(-1.5,0)$);
+        \draw (sw4) node[bigground, line width=0.1pt]{}
+        to[push button,l=\small BTN4] (ind4b);
+        % =====================================================
+        % SERVOS
+        % =====================================================
+        \node[draw, minimum width=1.4cm, minimum height=1cm, anchor=west]
+        (servo1) at ($(pwm1)+(5,0)$) {Servo};
+
+        \node[draw, minimum width=1.4cm, minimum height=1cm, anchor=west]
+        (servo3) at ($(pwm3)+(3.6,0)$) {Servo};
+
+        % Señal PWM
+        \draw (pwm1) -- (servo1.west);
+        \draw (pwm3) -- (servo3.west);
+
+        % Conexiones de alimentación
+        \draw (servo1.north) -- ++(0,0.2) node[VCC5]{5V};
+        \draw (servo3.north) -- ++(0,0.2) node[VCC5]{5V};
+
+        \draw (servo1.south) -- ++(0,-0.2) node[bigground]{};
+        \draw (servo3.south) -- ++(0,-0.2) node[bigground]{};
+
+        % PWM restante
+        \draw (pwm5) -- ++(2.5,0) node[ocirc, scale=3.6]{};
+        \draw (pwm6) -- ++(2.5,0) node[ocirc, scale=3.6]{};
+
+        \draw (pwm2) -- ++(2.5,0) node[ocirc, scale=3.6]{};
+        \draw (pwm4) -- ++(2.5,0) node[ocirc, scale=3.6]{};
+
+            \end{circuitikz}
+        \caption{Asignación sugerida de pines del ESP32 (parte 1).}
+        \label{fig:full-rc-wiring-a}
+    \end{figure}
+
+\clearpage % forces next floats to appear after a page break
+
+       % --- Figure 2: bottom part (your snippet) ---
+       \begin{figure}[H]
+           \centering
+           \begin{circuitikz}[scale=0.6, transform shape, font=\large]
+        % =====================================================
+        % CONTROL DE MOTOR PWM (PWM KL 26)
+        % =====================================================
+
+        % Referencia local
+        \coordinate (motorbase) at (-9.5,-22);
+
+        % Símbolo de motor
+        \node[draw, circle, minimum size=0.9cm] (motor) at ($(motorbase)+(0,2.0)$) {\small M};
+
+        % MOSFET con etiqueta de parte
+        \node[nmos, anchor=D, scale=2.4, transform shape,
+        label=right:{\small IRLZ44N}]
+        (mos) at ($(motorbase)+(0,-0.5)$) {};
+
+        % Cable desde el drenador del MOSFET a la parte inferior del motor
+        \draw (mos.D) -- (motor.south);
+
+        % Cable desde la parte superior del motor a VCC
+        \draw (motor.north) -- ++(0,1.8) node[VCC12]{6V to 12V};
+
+        % Fuente del MOSFET a tierra
+        \draw (mos.S) -- ++(0,-0.8) node[bigground]{};
+
+        % Diodo flyback
+        \draw (mos.D) -- ++(2.0,0)
+        to[Do,l=\small 1N5819]
+        ($(motor.north)+(2.0,1)$) -- ($(motor.north)+(0,1)$);
+
+        % Resistencia de compuerta
+        \draw ($(mos.G)+(-4,0)$)
+        to[R,l=\small 220$\Omega$]
+        (mos.G);
+
+        % Resistencia pull-down
+        \draw ($(mos.G)+(-1,0)$)
+        to[R,l=\small 10k]
+        ($(mos.G)+(-1,-2.5)$)
+        node[bigground]{};
+
+        % Terminal PWM
+        \draw ($(mos.G)+(-4,0)$) -- ++(-0.5,0)
+        node[ocirc, scale=3.6, label=left:{\small PWM KL (26)}]{};
+
+        % =====================================================
+        % CONTROL LED PWM (PWM KR 27)
+        % =====================================================
+
+        % Punto de referencia
+        \coordinate (pwmkr) at (-14.5,-18);
+
+        % Circuito LED
+        \draw (pwmkr)
+        to[R,l=\small 330$\Omega$] ++(2,0)
+        to[led,l=\small LED] ++(1.5,0)
+        -- ++(0,-1.2) node[bigground]{};
+
+        % Línea de control PWM
+        \draw (pwmkr) -- ++(-1,0)
+        node[ocirc, scale=3, label=left:{\small PWM KR (27)}]{};
+
+
+        % =====================================================
+        % DRIVER DE MOTOR PUENTE H (DRV8833) PARA CONTROL PWM
+        % =====================================================
+
+        \node[draw, thick, minimum width=3.8cm, minimum height=4cm] (drv) at (1,-22) {DRV8833};
+
+        % -----------------------------------------------------
+        % Motor A
+        % -----------------------------------------------------
+
+        \node[draw, circle, minimum size=0.9cm] (motorA) at (5,-23.0) {M};
+
+        \draw (drv.east) ++(1.6,-0.4)
+        node[left]{\small AOUT1}
+        -| (motorA.north);
+
+        \draw (drv.east) ++(1.6,-1.6)
+        node[left]{\small AOUT2}
+        -| (motorA.south);
+
+        \node at (6.6,-23.0) {\small DC Motor A};
+
+        % -----------------------------------------------------
+        % Motor B
+        % -----------------------------------------------------
+
+        \node[draw, circle, minimum size=0.9cm] (motorB) at (5,-20.8) {M};
+
+        \draw (drv.east) ++(1.6,1.8)
+        node[left]{\small BOUT1}
+        -| (motorB.north);
+
+        \draw (drv.east) ++(1.6,0.6)
+        node[left]{\small BOUT2}
+        -| (motorB.south);
+
+        \node at (6.6,-20.8) {\small DC Motor B};
+
+        % -----------------------------------------------------
+        % Alimentación de motor
+        % -----------------------------------------------------
+
+        \draw ($(drv.north)+(0,0.5)$)
+        node[below]{\small VM}
+        -- ++(0,1)
+        node[VCC12]{2.7V to 10.8V};
+
+        % -----------------------------------------------------
+        % Alimentación lógica
+        % -----------------------------------------------------
+
+        \draw (drv.west) ++(-1.2,1.7)
+        node[right]{\small VCC}
+        -- ++(-1.5,0)
+        node[vcc]{3.3V};
+
+        % -----------------------------------------------------
+        % Tierra
+        % -----------------------------------------------------
+
+        \draw (drv.south)
+        -- ++(0,-0.5)
+        node[bigground,label={[yshift=-25]below:{\small GND}}]{};
+
+        % -----------------------------------------------------
+        % Control Motor A
+        % -----------------------------------------------------
+
+        \draw (drv.west) ++(-1.2,-1)
+        node[right]{\small AIN1}
+        -- ++(-1.5,0)
+        node[ocirc, scale=3.6,label=left:{\small PWM LY (19)}]{};
+
+        \draw (drv.west) ++(-1.2,-1.6)
+        node[right]{\small AIN2}
+        -- ++(-1.5,0)
+        node[ocirc, scale=3.6,label=left:{\small DIR (26)}]{};
+
+        % -----------------------------------------------------
+        % Control Motor B
+        % -----------------------------------------------------
+
+        \draw (drv.west) ++(-1.2,0.6)
+        node[right]{\small BIN1}
+        -- ++(-1.5,0)
+        node[ocirc, scale=3.6,label=left:{\small PWM RY (23)}]{};
+
+        \draw (drv.west) ++(-1.2,-0.0)
+        node[right]{\small BIN2}
+        -- ++(-1.5,0)
+        node[ocirc, scale=3.6,label=left:{\small DIR2 (27)}]{};
+
+    \end{circuitikz}
+    \caption{Asignación sugerida de pines del ESP32 y conexiones de periféricos para la configuración \texttt{FULL\_RC\_MODE}. Los circuitos mostrados son ejemplos y pueden modificarse según los requisitos específicos de la aplicación del usuario.}
+    \label{fig:full-rc-wiring}
+\end{figure}
+% -------------------- FIN FIGURA --------------------
+
+\section{Resumen Rápido}
+\label{sec:wiring-quick-summary}
+
+La Figura~\ref{fig:full-rc-wiring} es una referencia práctica de cableado para el proyecto
+\textbf{MICSBOL/ESP32\_BT\_Controller}. Muestra:
+
+\begin{itemize}
+    \item \textbf{Entradas (lado izquierdo):}
+    \begin{itemize}
+        \item Bus I2C (SDA/SCL) para sensores o expansión
+        \item Entradas analógicas (NUM1/NUM2/AIN1/AIN2) usadas como fuentes de telemetría
+        \item Entradas de indicadores digitales (IND1--IND4) usadas para construir una máscara de estado
+    \end{itemize}
+    \item \textbf{Salidas (lado derecho):}
+    \begin{itemize}
+        \item Salidas PWM para servos, motores, brillo de LED y zumbador
+        \item Salidas de switches (SW1--SW4 en modo directo, SW1--SW6 en modo MCP)
+        \item Salidas de pulso/evento usadas para acciones momentáneas (eventos de botón)
+    \end{itemize}
+\end{itemize}
+
+\noindent En términos de código:
+\begin{itemize}
+    \item \texttt{control.cpp} mapea campos de \texttt{rcStatePacket} a acciones (dirección, motores, paneo, LED, zumbador, switches).
+    \item \texttt{hal\_output.cpp} realiza las escrituras reales de hardware (PWM vía \texttt{ledcWrite}, GPIO vía \texttt{digitalWrite},
+    salidas MCP vía \texttt{mcpWriteOutput}, pulsos vía \texttt{pulseStart}).
+    \item \texttt{input\_hw.cpp} lee pines ADC e indicadores (usados como fuentes de telemetría).
+    \item \texttt{pins.h} define el mapeo de GPIO (y cambia dependiendo del modo de proyecto).
+\end{itemize}
+
+\section{Explicación Directa de Cada Grupo (Qué hace)}
+\label{sec:wiring-components}
+
+\subsection{I2C (SDA 21, SCL 22)}
+Se usa para conectar dispositivos I2C externos. En el repositorio, el mismo bus también se usa en la configuración
+\texttt{FULL\_RC\_MODE\_MCP} para comunicarse con un expansor MCP23017 (dirección \texttt{0x20} en \texttt{pins.h}).
+
+\subsection{Entradas analógicas de telemetría (NUM1/NUM2/AIN1/AIN2)}
+Estas son entradas ADC leídas en \texttt{input\_hw.cpp} usando \texttt{analogRead(...)}.
+Están pensadas para fuentes de telemetría como voltaje de batería (a través de un divisor), sensores de temperatura, sensores de luz,
+potenciómetros, etc.
+
+\subsection{Entradas de indicadores digitales (IND1--IND4)}
+Estas son entradas digitales (GPIO) que representan estados on/off (fin de carrera, línea de falla, bumper, etc.).
+En \texttt{input\_hw.cpp} se combinan en una máscara de bits para que múltiples estados puedan enviarse a la UI Android.
+
+\subsection{Salidas PWM (PWM LX/LY/RX/RY/KL/KR)}
+Las salidas PWM son accionadas por \texttt{hal\_output.cpp} usando \texttt{ledcWrite(...)} y se alimentan con valores desde
+\texttt{control.cpp}.
+Usos típicos en el concepto de cableado del repositorio:
+\begin{itemize}
+    \item servos (dirección, paneo de cámara)
+    \item PWM de velocidad de motor
+    \item brillo de LED
+    \item intensidad del zumbador
+\end{itemize}
+
+\subsection{Salidas de switches (SW1--SW6)}
+Estas son salidas digitales controladas por bits de switch recibidos desde la app Android (\texttt{control.cpp} llama a
+\texttt{halSetSwitch(index, state)}).
+\begin{itemize}
+    \item El modo directo proporciona 4 salidas físicas (\texttt{PIN\_SW1}..\texttt{PIN\_SW4}).
+    \item El modo MCP proporciona 6 salidas mediante MCP23017 (\texttt{GPB0\_SW1}..\texttt{GPB5\_SW6}).
+\end{itemize}
+
+\subsection{Salidas de pulso/evento}
+Los eventos de botones Android se manejan por \texttt{controlHandleEvent(eventId)} en \texttt{control.cpp}, lo que dispara
+pulsos momentáneos mediante \texttt{halPulseSwitch(index)}. Los pulsos se implementan de forma no bloqueante en \texttt{pulse.cpp}.
+Estas salidas son ideales para disparos (bocina, pestillo, reset) más que para estados continuos.
+
+\section{Resumen (Un Párrafo)}
+\label{sec:wiring-resume}
+
+El diagrama de cableado agrupa las conexiones del ESP32 exactamente de la manera en que el código del repositorio está organizado:
+\texttt{control.cpp} decide qué significa cada entrada, \texttt{hal\_output.cpp} acciona salidas PWM y GPIO,
+\texttt{input\_hw.cpp} lee entradas analógicas y de indicadores para telemetría, y \texttt{pins.h} define el mapeo de GPIO.
+Al mantener estas responsabilidades separadas, puedes adaptar el hardware (cambiar números de pin, agregar dispositivos I2C, cambiar a MCP23017)
+sin reescribir la lógica general de control.
