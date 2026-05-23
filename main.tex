@@ -12,13 +12,13 @@
 %\usepackage[spanish,english]{babel}
 
 
-%\newcommand{\doclang}{spanish}   % or spanish, french, etc.
-%\usepackage[english, spanish]{babel}
-%\selectlanguage{spanish}
+\newcommand{\doclang}{spanish}   % or spanish, french, etc.
+\usepackage[english, spanish]{babel}
+\selectlanguage{spanish}
 
-\newcommand{\doclang}{english}   % or spanish, french, etc.
-\usepackage[english]{babel}
-\selectlanguage{english}
+%\newcommand{\doclang}{english}   % or spanish, french, etc.
+%\usepackage[english]{babel}
+%\selectlanguage{english}
 
 % --- Page Layout ---
 \usepackage[a4paper,left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
@@ -54,8 +54,9 @@
 	breaklines=true,
 	tabsize=2
 }
-
-
+\usepackage{pdflscape} % rotates that page in the PDF viewer
+\usepackage{pdfpages} % in the preamble
+\usepackage{caption}
 % --- Hyperlinks (ALWAYS LAST) ---
 \usepackage[hidelinks]{hyperref}
 \ctikzset{
@@ -100,7 +101,7 @@
 	\tableofcontents
 	\newpage
     \input{chapters/\doclang/01_introduction}
-	\input{chapters/\doclang/02_requirements}
+	\input{chapters/\doclang/02_architecture}
 	\input{chapters/\doclang/03_hardware_setup}
 	\input{chapters/\doclang/04_firmware_upload}
 	\input{chapters/\doclang/05_connecting_app}
