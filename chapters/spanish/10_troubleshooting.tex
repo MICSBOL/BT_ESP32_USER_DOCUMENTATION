@@ -5,7 +5,7 @@ Si tu proyecto no funciona como se espera, este capítulo te ayuda a identificar
 \textbf{ambos lados del sistema}:
 
 \begin{itemize}
-    \item \textbf{Android (EmitterApp):} controles de la interfaz, emparejamiento/conexión Bluetooth y si se están procesando comandos/telemetría.
+    \item \textbf{Android (TeleCon4ESP32):} controles de la interfaz, emparejamiento/conexión Bluetooth y si se están procesando comandos/telemetría.
     \item \textbf{ESP32 (ESP32\_BT\_Controller):} carga del firmware, cableado de pines, integridad de alimentación, enlace Bluetooth SPP y generación de telemetría.
 \end{itemize}
 
@@ -85,7 +85,7 @@ El PIN por defecto normalmente es \texttt{1234}.
 \label{sec:android-controls}
 
 \subsection*{El joystick vuelve al centro vs se queda fijo}
-EmitterApp soporta diferentes modos de joystick (por ejemplo, spring vs hold). Si el robot se comporta
+TeleCon4ESP32 soporta diferentes modos de joystick (por ejemplo, spring vs hold). Si el robot se comporta
 como si la aceleración ``no se quedara'' o la dirección estuviera ``pegada'':
 
 \begin{itemize}
